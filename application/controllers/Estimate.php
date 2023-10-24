@@ -36,6 +36,7 @@ class Estimate extends MY_Controller{
         $this->data['trans_number'] = $this->data['trans_prefix'].$this->data['trans_no'];
         $this->data['partyList'] = $this->party->getPartyList(['party_category'=>1]);
         $this->data['itemList'] = $this->item->getItemList(['item_type'=>1]);
+        $this->data['brandList'] = $this->brandMaster->getBrandList();
         $this->data['unitList'] = $this->item->itemUnits();
         $this->data['hsnList'] = $this->hsnModel->getHSNList();
 		$this->data['taxList'] = array();//$this->taxMaster->getActiveTaxList(2);
@@ -63,7 +64,7 @@ class Estimate extends MY_Controller{
                 endif;
 
                 if($row['stock_eff'] == 1):
-                    $postData = ['location_id' => $this->RTD_STORE->id,'batch_no' => "GB",'item_id' => $row['item_id'],'stock_required'=>1,'single_row'=>1];
+                    $postData = ['location_id' => $this->RTD_STORE->id,'batch_no' => $row['brand_name'],'item_id' => $row['item_id'],'stock_required'=>1,'single_row'=>1];
                     
                     $stockData = $this->itemStock->getItemStockBatchWise($postData);  
                     
@@ -104,6 +105,7 @@ class Estimate extends MY_Controller{
         $this->data['gstinList'] = $this->party->getPartyGSTDetail(['party_id' => $dataRow->party_id]);
         $this->data['partyList'] = $this->party->getPartyList(['party_category' => 1]);
         $this->data['itemList'] = $this->item->getItemList(['item_type'=>1]);
+        $this->data['brandList'] = $this->brandMaster->getBrandList();
         $this->data['unitList'] = $this->item->itemUnits();
         $this->data['hsnList'] = $this->hsnModel->getHSNList();
 		$this->data['taxList'] = array();//$this->taxMaster->getActiveTaxList(2);
