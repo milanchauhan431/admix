@@ -17,7 +17,7 @@
         
         <table class="table item-list-bb fs-22" style="margin-top:5px;width:97%;">
             <tr>
-                <td style="width:60%; vertical-align:top;" rowspan="5">
+                <td style="width:60%; vertical-align:top;" rowspan="4">
                     <b>Name & Address of the Receipiant (BILL TO)</b><br>
                     <b><?=$invData->party_name?></b><br>
                     <?=(!empty($partyData->party_address) ? $partyData->party_address : '')?><br>
@@ -46,14 +46,6 @@
             <tr>
                 <td style="width:40%;" colspan="2">
                     <b>Transport</b> : <?=(!empty($invData->transaport_name))?$invData->transaport_name." - ".$invData->transaport_gst_no:""?>
-                </td>
-            </tr>
-            <tr>
-                <td style="width:23%">
-                    <b>PO. No.</b> : 
-                </td>
-                <td style="width:17%">
-                    <b>Date</b> : 
                 </td>
             </tr>
         </table>
