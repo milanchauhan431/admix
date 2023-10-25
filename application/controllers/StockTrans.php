@@ -7,13 +7,19 @@ class StockTrans extends MY_Controller{
 		parent::__construct();
 		$this->data['headData']->pageTitle = "FG Stock Inward";
 		$this->data['headData']->controller = "stockTrans";        
-        $this->data['headData']->pageUrl = "stockTrans";
-        $this->data['entryData'] = $this->transMainModel->getEntryType(['controller'=>'stockTrans']);
+        $this->data['headData']->pageUrl = "stockTrans/stockRegister";
+        $this->data['entryData'] = $this->transMainModel->getEntryType(['controller'=>'stockTrans/stockRegister']);
 	}
 
     public function index(){
         $this->data['tableHeader'] = getStoreDtHeader("stockTrans");
         $this->load->view($this->indexPage,$this->data);
+    }
+	
+	public function stockRegister(){
+        $this->data['pageHeader'] = 'STOCK REGISTER';
+        $this->data['headData']->pageUrl = "reports/storeReport/stockRegister";
+        $this->load->view("stock_trans/item_stock",$this->data);
     }
 
     public function getDTRows($status = 0){

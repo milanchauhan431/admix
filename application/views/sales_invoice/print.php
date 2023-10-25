@@ -1,15 +1,10 @@
+
+<div style="font-size:15px;font-weight:500;position:fixed;top:-21mm;right:-15px;text-align:right;color:#343434">
+    1, Umakant Pandit Udhyog Nagar,<br>Nr. Anand Bunglow Chowk,<br>Rajkot-360005
+</div>
 <div class="row">
     <div class="col-12">
-        <?php if(!empty($header_footer)): ?>
-        <!-- <table>
-            <tr>
-                <td>
-                    <img src="<?=$letter_head?>" class="img">
-                </td>
-            </tr>
-        </table> -->
-        <?php endif; ?>
-
+        
         <table class="table bg-light-grey" style="margin-left:12px;width:97%;">
             <tr class="" style="letter-spacing: 2px;font-weight:bold;padding:2px !important; border-bottom:1px solid #000000;">
                 <th style="width:33%;" class="fs-18 text-left">
@@ -71,7 +66,7 @@
                         <th style="width:10%;">HSN/SAC</th>
                         <th style="width:60px;">Qty</th>
                         <th style="width:50px;">Rate<br><small>('.$partyData->currency.')</small></th>
-                        <th style="width:50px;">Disc<br><small>(%)</small></th>
+                        <!--<th style="width:50px;">Disc<br><small>(%)</small></th>-->
                         <th style="width:50px;">GST<br><small>(%)</small></th>
                         <th style="width:90px;">Amount<br><small>('.$partyData->currency.')</small></th>
                     </tr>
@@ -90,23 +85,10 @@
                                 echo '<td class="text-center">'.$row->hsn_code.'</td>';
                                 echo '<td class="text-center">'.floatVal($row->qty).' ('.$row->unit_name.')</td>';
                                 echo '<td class="text-right">'.floatVal($row->price).'</td>';
-                                echo '<td class="text-right">'.floatVal($row->disc_per).'</td>';
+                                //echo '<td class="text-right">'.floatVal($row->disc_per).'</td>';
                                 echo '<td class="text-center">'.$row->gst_per.'</td>';
                                 echo '<td class="text-right">'.$row->taxable_amount.'</td>';
                             echo '</tr>';
-
-                            /* if(($rowCount == $maxLinePP && $pageCount == 1) || ($rowCount == 20 && $pageCount != 1)): 
-                                echo '
-                                    </tbody></table>
-                                    <div class="text-right"><i>Continue to Next Page</i></div>
-                                    <pagebreak>
-                                    <table class="table item-list-bb" style="margin-top:10px;">
-                                        '.$thead.'
-                                    <tbody>'; 
-                                $rowCount = 0; // Reset the row count
-                                $pageCount++; // Increment the page count
-                            endif;
-                            $rowCount++; */
                             
                             $totalQty += $row->qty;
                             if($row->gst_per > $migst){$migst=$row->gst_per;$mcgst=$row->cgst_per;$msgst=$row->sgst_per;}
@@ -124,7 +106,7 @@
                                 <td style="border-top:none;border-bottom:none;"></td>
                                 <td style="border-top:none;border-bottom:none;"></td>
                                 <td style="border-top:none;border-bottom:none;"></td>
-                                <td style="border-top:none;border-bottom:none;"></td>
+                                <!--<td style="border-top:none;border-bottom:none;"></td>-->
                             </tr>';
                         endfor;
                     endif;
@@ -184,12 +166,12 @@
                 <tr>
                     <th colspan="3" class="text-right">Total Qty.</th>
                     <th class="text-right"><?=floatval($totalQty)?></th>
-                    <th></th>
+                    <!--<th></th>-->
                     <th colspan="2" class="text-right">Sub Total</th>
                     <th class="text-right"><?=sprintf('%.2f',$invData->taxable_amount)?></th>
                 </tr>
                 <tr>
-                    <td class="text-left" colspan="5" rowspan="<?=$rwspan?>">
+                    <td class="text-left" colspan="4" rowspan="<?=$rwspan?>">
                         <b>Bank Name : </b> <?=$companyData->company_bank_name.", ".$companyData->company_bank_branch?><br>
                         <b>A/c. No. : </b><?=$companyData->company_acc_no?><br>
                         <b>IFSC Code : </b><?=$companyData->company_ifsc_code?>
@@ -203,7 +185,7 @@
                 </tr>
                 <?=$beforExp.$taxHtml.$afterExp?>
                 <tr>
-                    <td class="text-left" colspan="5" rowspan="<?=$fixRwSpan?>">
+                    <td class="text-left" colspan="4" rowspan="<?=$fixRwSpan?>">
                         <b>GST Amount (In Words)</b> : <?=($totalTaxAmount > 0)?numToWordEnglish(sprintf('%.2f',$totalTaxAmount)):""?>
                         <hr>
                         <b>Bill Amount (In Words)</b> : <?=numToWordEnglish(sprintf('%.2f',$invData->net_amount))?>

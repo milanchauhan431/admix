@@ -183,7 +183,7 @@ class Ebill extends MY_Controller{
             $errorMessage['trans_mode'] = "Transport Mode is required.";
         if(empty($data['trans_distance']))
             $errorMessage['trans_distance'] = "Trans. Distance is required.";
-        if(empty($data['vehicle_no']))
+        if(empty($data['vehicle_no']) && empty($data['transport_name']))
             $errorMessage['vehicle_no'] = "Vehicle no. is required.";
 		if(empty($data['from_address']))
             $errorMessage['from_address'] = "Dispatch Address is required.";

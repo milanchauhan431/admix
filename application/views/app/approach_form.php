@@ -35,6 +35,21 @@
             </select>
         </div>
         <div class=" form-group  boxed animated">
+            <label for="sales_executive">Sales Executives</label>
+            <select class="form-control select2" name="sales_executive" id="sales_executive">
+                <option value="">Select Sales Executive</option>
+                <?php
+                if(!empty($salesExecutives)){
+                    foreach($salesExecutives as $row){
+                        $selected = (!empty($dataRow->sales_executive) && $dataRow->sales_executive == $row->id)?'selected':(($this->loginId == $row->id)?'selected':'');
+                        $disabled = (in_array($this->userRole,[-1,1]) || $row->id == $this->loginId)?:'disabled';
+                        echo '<option value="'.$row->id.'" '.$selected.' '.$disabled.'>'.$row->emp_name.' </option>';
+                    }
+                }
+                ?>
+            </select>
+        </div> 
+        <div class=" form-group  boxed animated">
             <label for="party_name">Customer</label>
             <input type="text" name="party_name" id="party_name" value="<?=(!empty($dataRow->party_name))?$dataRow->party_name:""?>" class="form-control req" />
             <input type="hidden" name="party_id" id="party_id" value="<?=(!empty($dataRow->party_id))?$dataRow->party_id:""?>" />

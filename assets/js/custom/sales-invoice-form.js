@@ -167,7 +167,7 @@ $(document).ready(function(){
 	$(document).on('keyup change',"#itemForm #qty",function(){
 		var qty = $(this).val() || 0;
 		var box_pcs = $("#itemForm #packing_qty").val() || 0;
-		var totalBox = parseFloat(parseFloat(qty) * parseFloat(box_pcs)).toFixed(1);
+		var totalBox = parseFloat(parseFloat(qty) / parseFloat(box_pcs)).toFixed(1);
 		$("#itemForm #total_box").val(totalBox);
 	});
 	

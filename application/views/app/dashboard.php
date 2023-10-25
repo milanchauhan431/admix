@@ -24,6 +24,14 @@
 						<strong>FG Inward</strong>
 					</a>
 				</div>
+				<div class="item">
+					<a href="<?=base_url('app/stockTrans/stockRegister');?>">
+						<div class="icon-wrapper bg-warning">
+							<i class="icon-Notepad"></i>				
+						</div>
+						<strong>Stock Register</strong>
+					</a>
+				</div>
 			</div>
 		</div>
 	</div>

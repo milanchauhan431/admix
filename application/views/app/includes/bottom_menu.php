@@ -19,4 +19,10 @@
 			<strong>FG Inward</strong>
 		</div>
 	</a>
+	<a href="<?=base_url('app/stockTrans/stockRegister');?>" class="item <?=(($this->data['headData']->controller == 'app/salesOrder') && $this->data['bottomMenuName'] == 'salesOrder')?'active':''?>">
+		<div class="col">
+			<ion-icon name="document-text-outline"></ion-icon>
+			<strong>Stock Register</strong>
+		</div>
+	</a>
 </div>

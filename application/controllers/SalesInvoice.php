@@ -174,7 +174,7 @@ class SalesInvoice extends MY_Controller{
         foreach($printTypes as $printType):
             ++$i;           
             $this->data['printType'] = $printType;
-            $this->data['maxLinePP'] = (!empty($postData['max_lines']))?$postData['max_lines']:14;
+            $this->data['maxLinePP'] = (!empty($postData['max_lines']))?$postData['max_lines']:17;
 		    $pdfData .= $this->load->view('sales_invoice/print',$this->data,true);
             if($i != $countPT): $pdfData .= "<pagebreak>"; endif;
         endforeach;
@@ -196,7 +196,7 @@ class SalesInvoice extends MY_Controller{
             $mpdf->SetDefaultBodyCSS('background-image-resize', 6);
 		}
 		//$mpdf->AddPage('P','','','','',10,5,(($postData['header_footer'] == 1)?5:35),5,5,5,'','','','','','','','','','A4-P');
-        $mpdf->AddPage('P','','','','',7,5,43,7,3,15,'','','','','','','','','','A4-P');
+        $mpdf->AddPage('P','','','','',7,13,43,7,3,15,'','','','','','','','','','A4-P');
 		$mpdf->WriteHTML($pdfData);
 		$mpdf->Output($pdfFileName,'I');
 	}

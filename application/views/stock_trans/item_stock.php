@@ -6,35 +6,17 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="row">
-                            <div class="col-md-6">
-                                <h4 class="card-title pageHeader"><?=$pageHeader?></h4>
+							<div class="col-md-4">
+								<a href="<?= base_url($headData->controller."/stockRegister") ?>" class="btn btn-outline-primary active">Stock Register</a>
+								<a href="<?= base_url($headData->controller) ?>" class="btn btn-outline-primary">FG Stock Inward</a>
+							</div>
+                            <div class="col-md-4">
+                                <h4 class="card-title text-center"><?=$pageHeader?></h4>
                             </div>       
-                            <div class="col-md-6 float-right">  
-                                <div class="input-group">
-                                    <div class="input-group-append" style="width:50%;">
-                                        <select id="item_type" class="form-control select2">
-                                            <?php
-                                                foreach($this->itemTypes as $type=>$typeName):
-                                                    echo '<option value="'.$type.'">'.$typeName.'</option>';
-                                                endforeach;
-                                            ?>
-                                        </select>
-                                    </div>
-                                    <div class="input-group-append" style="width:30%;">
-                                        <select id="stock_type" class="form-control select2" >
-                                            <option value="0">ALL</option>
-                                            <option value="1">With Stock</option>
-                                            <option value="2">Without Stock</option>
-                                        </select>
-                                    </div>
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn waves-effect waves-light btn-success refreshReportData loadData" title="Load Data">
-									        <i class="fas fa-sync-alt"></i> Load
-								        </button>
-                                    </div>
-                                </div>
-                                <div class="error stock_type"></div>
-                            </div>                  
+                            <div class="col-md-4 float-right"> 
+								<input type="hidden" id="item_type" value="1" />
+								<input type="hidden" id="stock_type" class="loadData" value="1" />   
+							</div>								
                         </div>                                         
                     </div>
                     <div class="card-body reportDiv" style="min-height:75vh">
@@ -66,18 +48,18 @@
 <script>
 $(document).ready(function(){
 	reportTable();
-    setTimeout(function(){$(".loadData").trigger('click');},500);
+    setTimeout(function(){$(".loadData").trigger('keyup');},500);
     
-    $(document).on('click','.loadData',function(e){
+    $(document).on('keyup','.loadData',function(e){
 		$(".error").html("");
 		var valid = 1;
 		var item_type = $('#item_type').val();
-		var stock_type = $('#stock_type').val();
+		var stock_type = $('#stock_type').val(); console.log('item_type: '+item_type+' | '+'stock_type: '+stock_type);
 		if($("#item_type").val() == ""){$(".item_type").html("Item Type is required.");valid=0;}
 		if($("#stock_type").val() == ""){$(".stock_type").html("Stock type is required.");valid=0;}
 		if(valid){
             $.ajax({
-                url: base_url + controller + '/getStockRegisterData',
+                url: base_url + 'reports/storeReport/getStockRegisterData',
                 data: {item_type:item_type,stock_type:stock_type},
 				type: "POST",
 				dataType:'json',
@@ -97,7 +79,7 @@ $(document).ready(function(){
 		
 		$.ajax({
 			type: "POST",
-			url: base_url + controller + '/stockTransactions',
+			url: base_url + 'reports/storeReport/stockTransactions',
 			data: {
 				item_id: item_id
 			}
