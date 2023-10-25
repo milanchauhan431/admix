@@ -37,6 +37,7 @@ class SalesInvoice extends MY_Controller{
         $this->data['partyList'] = $this->party->getPartyList(['party_category'=>1]);
         $this->data['itemList'] = $this->item->getItemList(['item_type'=>1]);
         $this->data['brandList'] = $this->brandMaster->getBrandList();
+        $this->data['sizeList'] = $this->sizeMaster->getSizeList();
         $this->data['unitList'] = $this->item->itemUnits();
         //$this->data['hsnList'] = $this->hsnModel->getHSNList();
         $this->data['salesAccounts'] = $this->party->getPartyList(['system_code'=>$this->salesTypeCodes]);
@@ -112,6 +113,7 @@ class SalesInvoice extends MY_Controller{
         $this->data['partyList'] = $this->party->getPartyList(['party_category' => 1]);
         $this->data['itemList'] = $this->item->getItemList(['item_type'=>1]);
         $this->data['brandList'] = $this->brandMaster->getBrandList();
+        $this->data['sizeList'] = $this->sizeMaster->getSizeList();
         $this->data['unitList'] = $this->item->itemUnits();
         //$this->data['hsnList'] = $this->hsnModel->getHSNList();
         $this->data['salesAccounts'] = $this->party->getPartyList(['system_code'=>$this->salesTypeCodes]);

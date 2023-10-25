@@ -146,6 +146,8 @@ $(document).ready(function(){
             $("#itemForm input:hidden").val('')
             $('#itemForm #row_index').val("");
             $('#itemForm #stock_eff').val(1);
+            $('#itemForm #color').val("WHITE");
+            $('#itemForm #capacity').val("3 TON");
             $("#itemForm .select2").select2();
             if ($(this).data('fn') == "save") {
                 $("#item_id").focus();
@@ -163,6 +165,38 @@ $(document).ready(function(){
 		$("#itemForm .error").html("");
         $("#itemForm .select2").select2();
 	});  
+
+	$(document).on('change','#size_id,#color,#capacity',function(){
+		var size_id = $("#size_id :selected").val();
+		var color = $("#color :selected").val();
+		var capacity = $("#capacity :selected").val();
+		var party_id = $('#party_id').val();
+		$(".party_id").html("");
+		$(".size_id_error").html("");
+
+		if(party_id){
+			if(size_id != "" && color != "" && capacity != ""){
+				$.ajax({
+					url : base_url + controller + '/getItemDetail',
+					type : "post",
+					data : {size_id:size_id,color:color,capacity:capacity},
+					dataType : 'json'
+				}).done(function(response){
+					if(response.status == 1){
+						window["resItemDetail"](response);
+					}else{
+						window["resItemDetail"]();
+						$(".size_id_error").html(response.message);
+					}
+				});
+			}else{
+				window["resItemDetail"]();
+			}
+		}else{ 
+            $(".party_id").html("Party name is required.");
+			$("#size_id").val("");$("#size_id").select2();
+        }
+	});
 
 	$(document).on('keyup change',"#itemForm #qty",function(){
 		var qty = $(this).val() || 0;
@@ -198,7 +232,7 @@ $(document).ready(function(){
 				}
 			});
 		}
-	 });
+	});
 
 	$(document).on('change','#master_i_col_2',function(){
 		var transport_id = $(this).val();
@@ -232,6 +266,11 @@ $(document).ready(function(){
 				formData.item_type = $("#salesInvoiceItems tbody tr:eq("+i+") input[name='itemData["+countRow+"][item_type]']").val();
 				formData.stock_eff = $("#salesInvoiceItems tbody tr:eq("+i+") input[name='itemData["+countRow+"][stock_eff]']").val();
 				formData.p_or_m = $("#salesInvoiceItems tbody tr:eq("+i+") input[name='itemData["+countRow+"][p_or_m]']").val();
+				formData.brand_id = $("#salesInvoiceItems tbody tr:eq("+i+") input[name='itemData["+countRow+"][brand_id]']").val();
+    			formData.brand_name = $("#salesInvoiceItems tbody tr:eq("+i+") input[name='itemData["+countRow+"][brand_name]']").val();
+    			formData.size_id = $("#salesInvoiceItems tbody tr:eq("+i+") #size_id"+countRow).val();
+    			formData.color = $("#salesInvoiceItems tbody tr:eq("+i+") #color"+countRow).val();
+    			formData.capacity = $("#salesInvoiceItems tbody tr:eq("+i+") #capacity"+countRow).val();
 				formData.hsn_code = $("#salesInvoiceItems tbody tr:eq("+i+") input[name='itemData["+countRow+"][hsn_code]']").val();
 				formData.qty = $("#salesInvoiceItems tbody tr:eq("+i+") input[name='itemData["+countRow+"][qty]']").val();
 				formData.packing_qty = $("#salesInvoiceItems tbody tr:eq("+i+") input[name='itemData["+countRow+"][packing_qty]']").val();
@@ -359,6 +398,9 @@ function AddRow(data) {
     var pormInput = $("<input/>", { type: "hidden", name: "itemData["+itemCount+"][p_or_m]", value: -1 });
 	var brandIdInput = $("<input/>", { type: "hidden", name: "itemData["+itemCount+"][brand_id]", value: data.brand_id });
     var brandNameInput = $("<input/>", { type: "hidden", name: "itemData["+itemCount+"][brand_name]", value: data.brand_name });
+    var sizeIdInput = $("<input/>", { type: "hidden", id: "size_id"+itemCount, value: data.size_id });
+    var colorInput = $("<input/>", { type: "hidden", id: "color"+itemCount, value: data.color });
+    var capacityInput = $("<input/>", { type: "hidden", id: "capacity"+itemCount, value: data.capacity });
     cell = $(row.insertCell(-1));
     cell.html(data.item_name);
     cell.append(idInput);
@@ -372,6 +414,9 @@ function AddRow(data) {
     cell.append(pormInput);
 	cell.append(brandIdInput);
     cell.append(brandNameInput);
+    cell.append(sizeIdInput);
+    cell.append(colorInput);
+    cell.append(capacityInput);
 
     var hsnCodeInput = $("<input/>", { type: "hidden", name: "itemData["+itemCount+"][hsn_code]", value: data.hsn_code });
 	cell = $(row.insertCell(-1));
@@ -495,19 +540,20 @@ function Edit(data, button) {
 	var row_index = $(button).closest("tr").index();
 	//$("#itemModel").modal();
 	//$("#itemModel .btn-save").hide();
-	var trans_id = ''; var from_entry_type = ''; var ref_id = '';
+	var trans_id = ''; var from_entry_type = ''; var ref_id = '';var org_price = 0
 	$.each(data, function (key, value) {
 		$("#itemForm #" + key).val(value);
 		
 		if(key=="id"){ trans_id = value; }
 		if(key=="from_entry_type"){ from_entry_type = value; }
 		if(key=="ref_id"){ ref_id = value; }
+		if(key=="org_price"){ org_price = value; }
 	});
 	$("#itemForm #trans_id").val(trans_id);
 	$("#itemForm #trans_from_entry_type").val(from_entry_type);
-	$("#itemForm #trans_ref_id").val(ref_id);
+	$("#itemForm #trans_ref_id").val(ref_id);	
+	$("#itemForm #price").val(org_price);
 	
-	$("#itemForm #price").val(data.org_price);
 	$("#itemForm .select2").select2();
 	$("#itemForm #row_index").val(row_index);
 	$("#itemForm #qty").trigger('change');
@@ -570,6 +616,7 @@ function resPartyDetail(response = ""){
 function resItemDetail(response = ""){
     if(response != ""){
         var itemDetail = response.data.itemDetail;
+        $("#itemForm #item_id").val(itemDetail.id);
         $("#itemForm #item_code").val(itemDetail.item_code);
         $("#itemForm #item_name").val(itemDetail.item_name);
         $("#itemForm #item_type").val(itemDetail.item_type);
@@ -595,6 +642,7 @@ function resItemDetail(response = ""){
 			}
 		});
     }else{
+		$("#itemForm #item_id").val("");
         $("#itemForm #item_code").val("");
         $("#itemForm #item_name").val("");
         $("#itemForm #item_type").val("");

@@ -192,12 +192,64 @@
 												<input type="hidden" class="itemFormInput" id="trans_ref_id" value="" />
 												<input type="hidden" class="itemFormInput" id="row_index" value="">
 												<input type="hidden" class="itemFormInput" id="item_code" value="" />
+												<input type="hidden" class="itemFormInput" id="item_id" value="" />
+												<input type="hidden" class="itemFormInput" id="item_name" value="" />
 												<input type="hidden" class="itemFormInput" id="item_type" value="1" />
 												<input type="hidden" class="itemFormInput" id="stock_eff" value="1" />
 												<input type="hidden" class="itemFormInput org_price" id="org_price" value="" />
                                                 <input type="hidden" class="itemFormInput" id="brand_name" value="">
 											</div>
-											<div class="col-md-4 form-group">
+
+                                            <div class="col-md-4 form-group">
+                                                <div class="input-group">
+                                                    <label for="size_id" style="width:34%;">Size</label>
+                                                    <label for="color" style="width:33%;">Color</label>
+                                                    <label for="capacity" style="width:33%;">Capacity</label>
+                                                </div>
+                                                <div class="input-group">                    
+                                                    <div class="input-group-append" style="width:34%;">
+                                                        <select id="size_id" class="form-control select2 itemFormInput">
+                                                            <option value="">Select Size</option>
+                                                            <?php
+                                                                foreach($sizeList as $row):
+                                                                    $selected = (!empty($dataRow->size_id) && $dataRow->size_id == $row->id)?"selected":"";
+                                                                    echo '<option value="'.$row->id.'" '.$selected.'>'.$row->size.'</option>';
+                                                                endforeach;
+                                                            ?>
+                                                        </select>
+                                                    </div>
+                                                    
+                                                    <div class="input-group-append" style="width:33%;">
+                                                        <select id="color" class="form-control select2 itemFormInput">
+                                                            <?php
+                                                                foreach($this->fgColorCode as $color=>$text):
+                                                                    $selected = (!empty($dataRow->color) && $dataRow->color == $color)?"selected":"";
+                                                                    echo '<option value="'.$color.'" '.$selected.'>'.$color.'</option>';
+                                                                endforeach;
+                                                            ?>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="input-group-append" style="width:33%;">
+                                                        <select id="capacity" class="form-control select2 itemFormInput">
+                                                            <?php
+                                                                foreach($this->fgCapacity as $capacity=>$text):
+                                                                    $selected = (!empty($dataRow->capacity) && $dataRow->capacity == $capacity)?"selected":"";
+                                                                    echo '<option value="'.$capacity.'" '.$selected.'>'.$capacity.'</option>';
+                                                                endforeach;
+                                                            ?>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="input-group">
+                                                    <div class="error size_id_error" style="width:34%;"></div>
+                                                    <div class="error color_error" style="width:33%;"></div>
+                                                    <div class="error capacity_error" style="width:33%;"></div>
+                                                </div>
+                                                <div class="error item_id"></div>
+                                            </div>
+
+											<!-- <div class="col-md-4 form-group hidden">
 												<label for="item_id">Product Name</label>
 												<div class="float-right">	
                                                     <span class="dropdown float-right">
@@ -214,9 +266,9 @@
 												<input type="hidden" id="item_name" class="form-control itemFormInput" value="" />
 												<select id="item_id" class="form-control select2 itemDetails itemOptions itemFormInput" data-res_function="resItemDetail" data-item_type="1">
 													<option value="">Select Product Name</option>
-													<?=getItemListOption($itemList)?>
+													<?php //getItemListOption($itemList); ?>
 												</select>
-											</div>
+											</div> -->
                                             <div class="col-md-2 form-group">
                                                 <label for="brand_id">Brand</label>
                                                 <select id="brand_id" class="form-control select2 itemFormInput">
@@ -255,10 +307,6 @@
 											<div class="col-md-3 form-group hidden">
 												<label for="hsn_code">HSN Code</label>
 												<input type="text" id="hsn_code" class="form-control numericOnly req itemFormInput" value="" />
-												<!--<select name="hsn_code" id="hsn_code" class="form-control select2">
-													<option value="">Select HSN Code</option>
-													<?php//getHsnCodeListOption($hsnList)?>
-												</select>-->
 											</div>
 											<div class="col-md-3 form-group hidden">
 												<label for="gst_per">GST Per.(%)</label>

@@ -1,7 +1,8 @@
 <?php
 class Estimate extends MY_Controller{
     private $indexPage = "estimate/index";
-    private $form = "estimate/form";    
+    private $form = "estimate/form"; 
+    private $paymentForm = "estimate/estimate_payment";
 
     public function __construct(){
 		parent::__construct();
@@ -124,91 +125,83 @@ class Estimate extends MY_Controller{
         endif;
     }
 
-    public function printInvoice($id="",$type=""){
-        $postData = $this->input->post();
-        //print_r($postData);exit;
-        $printTypes = array();
-        if(!empty($postData['original'])):
-            $printTypes[] = "ORIGINAL";
-        endif;
-
-        if(!empty($postData['duplicate'])):
-            $printTypes[] = "DUPLICATE";
-        endif;
-
-        if(!empty($postData['triplicate'])):
-            $printTypes[] = "TRIPLICATE";
-        endif;
-
-        if(!empty($postData['extra_copy'])):
-            for($i=1;$i<=$postData['extra_copy'];$i++):
-                $printTypes[] = "EXTRA COPY";
-            endfor;
-        endif;
-
-        $inv_id = (!empty($id))?$id:$postData['id'];
-
-		$this->data['invData'] = $invData = $this->estimate->getEstimate(['id'=>$inv_id,'itemList'=>1]);
-		$this->data['partyData'] = $this->party->getParty(['id'=>$invData->party_id]);
-        $this->data['taxList'] = $this->taxMaster->getActiveTaxList(2);
-        $this->data['expenseList'] = $this->expenseMaster->getActiveExpenseList(2);
-		$this->data['companyData'] = $companyData = $this->masterModel->getCompanyInfo();
-		$response="";
-		$logo=base_url('assets/images/logo.png');
-		$this->data['letter_head']=base_url('assets/images/letterhead-top.png');
-				
-        $pdfData = "";
-        $countPT = count($printTypes); $i=0;
-        foreach($printTypes as $printType):
-            ++$i;
-            $this->data['printType'] = $printType;
-            $this->data['maxLinePP'] = (!empty($postData['max_lines']))?$postData['max_lines']:14;
-		    $pdfData .= $this->load->view('sales_invoice/print',$this->data,true);
-            if($i != $countPT): $pdfData .= "<pagebreak>"; endif;
-        endforeach;
-
-        //print_r($pdfData);exit;
-		
-		$htmlHeader = '<img src="'.$this->data['letter_head'].'" class="img">';
-
-		$htmlFooter = '<table>
-            <tr>
-                <th colspan="2" style="vertical-align:bottom;text-align:right;font-size:1rem;padding:5px 2px;">
-                    For, ' . $companyData->company_name . '<br>
-                </th>
-            </tr>
-            <tr>
-                <td colspan="2" height="35"></td>
-            </tr>
-            <tr>
-                <td colspan="2" style="vertical-align:bottom;text-align:right;font-size:1rem;padding:5px 2px;"><b>Authorised Signature</b></td>
-            </tr>
-        </table>        
-        <table class="table top-table" style="margin-top:10px; border-top:1px solid #545454;">
-            <tr>
-                <td style="width:25%;font-size:12px;">This is computer generated invoice.</td>
-                <!--<td style="width:50%;text-align:left;">Inv No. & Date : '.$invData->trans_number.' ['.formatDate($invData->trans_date).']</td>
-                <td style="width:50%;text-align:right;">Page No. {PAGENO}/{nbpg}</td>-->
-            </tr>
-        </table>';
+    public function printEstimate($id){
+        $this->data['dataRow'] = $dataRow = $this->salesOrder->getSalesOrder(['id'=>$id,'itemList'=>1]);
+        $this->data['partyData'] = $this->party->getParty(['id'=>$dataRow->party_id]);
+        $this->data['companyData'] = $companyData = $this->masterModel->getCompanyInfo();
         
-            
+        $pdfData = $this->load->view('estimate/print', $this->data, true);        
+        
 		$mpdf = new \Mpdf\Mpdf();
-		$pdfFileName = str_replace(["/","-"," "],"_",$invData->trans_number).'.pdf';
-		/* $stylesheet = file_get_contents(base_url('assets/extra-libs/datatables.net-bs4/css/dataTables.bootstrap4.css'));
-        $stylesheet = file_get_contents(base_url('assets/css/style.css?v=' . time())); */
+		$filePath = realpath(APPPATH . '../assets/uploads/sales_quotation/');
+        $pdfFileName = $filePath.'/' . str_replace(["/","-"],"_",$dataRow->trans_number) . '.pdf';
         $stylesheet = file_get_contents(base_url('assets/css/pdf_style.css?v='.time()));
-		$mpdf->WriteHTML($stylesheet,1);
-		$mpdf->SetDisplayMode('fullpage');
-		$mpdf->SetWatermarkImage($logo,0.03,array(120,45));
-		$mpdf->showWatermarkImage = true;
-		$mpdf->SetProtection(array('print'));
+        $mpdf->WriteHTML($stylesheet, 1);
+        $mpdf->SetDisplayMode('fullpage');
+        $mpdf->SetWatermarkImage($logo, 0.03, array(120, 120));
+        $mpdf->showWatermarkImage = true;
+		$mpdf->AddPage('P','','','','',10,5,5,15,5,5,'','','','','','','','','','A4-P');
+        $mpdf->WriteHTML($pdfData);
 		
-		$mpdf->SetHTMLHeader($htmlHeader);
-		$mpdf->SetHTMLFooter($htmlFooter);
-		$mpdf->AddPage('P','','','','',10,5,38,30,5,5,'','','','','','','','','','A4-P');
-		$mpdf->WriteHTML($pdfData);
-		$mpdf->Output($pdfFileName,'I');
-	}
+		ob_clean();
+		$mpdf->Output($pdfFileName, 'I');		
+    }
+
+    public function estimatePayment(){
+        $data = $this->input->post();
+        $this->data['main_ref_id'] = $data['id'];
+        $this->load->view($this->paymentForm,$this->data);
+    }
+
+    public function saveEstimatePayment(){
+        $data = $this->input->post();
+        $errorMessage = array();
+
+        if(empty($data['entry_date']))
+            $errorMessage['entry_date'] = "Date is required.";
+        if(empty($data['amount']))
+            $errorMessage['amount'] = "Amount is required.";
+
+        if(!empty($errorMessage)):
+            $this->printJson(['status'=>0,'message'=>$errorMessage]);
+        else:
+            $this->printJson($this->estimate->saveEstimatePayment($data));
+        endif;
+    }
+
+    public function getEstimatePaymentTrans(){
+        $data = $this->input->post();
+        $result = $this->estimate->getEstimatePayments($data);
+
+        $tbodyData="";$i=1; 
+        if(!empty($result)):
+            foreach($result as $row):
+                $deleteParam = "{'postData':{'id' : ".$row->id."},'message' : 'Payment','fndelete':'deleteEstimatePayment','res_function':'resTrashEstimatePayment'}";
+                $tbodyData.= '<tr>
+                    <td>' . $i++ . '</td>
+                    <td>' . formatDate($row->entry_date) . '</td>
+                    <td>' . $row->received_by . '</td>
+                    <td>' . $row->amount . ' </td>
+                    <td>' . $row->remark . '</td>
+                    <td class="text-center">
+                        <button type="button" onclick="trash('.$deleteParam.');" class="btn btn-sm btn-outline-danger waves-effect waves-light btn-delete permission-remove"><i class="ti-trash"></i></button>
+                    </td>
+                </tr>';
+            endforeach;
+        else:
+            $tbodyData.= '<tr><td colspan="6" class="text-center">No data available in table</td></tr>';
+        endif;
+
+        $this->printJson(['status'=>1,"tbodyData"=>$tbodyData]);
+    }
+
+    public function deleteEstimatePayment(){
+        $id = $this->input->post('id');
+        if(empty($id)):
+            $this->printJson(['status'=>0,'message'=>'Somthing went wrong...Please try again.']);
+        else:
+            $this->printJson($this->estimate->deleteEstimatePayment($id));
+        endif;
+    }
 }
 ?>

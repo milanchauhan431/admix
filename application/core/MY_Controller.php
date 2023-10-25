@@ -211,5 +211,16 @@ class MY_Controller extends CI_Controller{
 
 		$this->printJson(['status'=>1,'data'=>$result]);
 	}
+
+	public function getItemDetail(){
+		$data = $this->input->post();
+		$itemDetail = $this->item->getItem($data);
+
+		if(empty($itemDetail)):
+			$this->printJson(['status'=>0,'message'=>'Item Not Found.']);
+		else:
+			$this->printJson(['status'=>1,'data'=>['itemDetail'=>$itemDetail]]);
+		endif;
+	}
 }
 ?>

@@ -236,5 +236,81 @@ class EstimateModel extends MasterModel{
             return ['status'=>2,'message'=>"somthing is wrong. Error : ".$e->getMessage()];
         }
     }
+
+    public function saveEstimatePayment($data){
+        try{
+            $this->db->trans_begin();
+
+            $postData = [
+                'id' => "",
+                'main_ref_id' => $data['main_ref_id'],
+                'table_name' => $this->transMain,
+                'description' => "EST PAYMENT",
+                'date_col_1' => $data['entry_date'],
+                't_col_1' => $data['received_by'],
+                'd_col_1' => $data['amount'],
+                't_col_2' => $data['remark']
+            ];
+            $result = $this->store($this->transDetails,$postData,'Payment');
+
+            $setData = array();
+            $setData['tableName'] = $this->transMain;
+            $setData['where']['id'] = $data['main_ref_id'];
+            $setData['set']['rop_amount'] = 'rop_amount, + '.$data['amount'];
+            $this->setValue($setData);
+
+            if ($this->db->trans_status() !== FALSE):
+                $this->db->trans_commit();
+                return $result;
+            endif;
+        }catch(\Throwable $e){
+            $this->db->trans_rollback();
+            return ['status'=>2,'message'=>"somthing is wrong. Error : ".$e->getMessage()];
+        }
+    }
+
+    public function getEstimatePayments($data){
+        $queryData = array();
+        $queryData['tableName'] = $this->transDetails;
+        $queryData['select'] = "id,main_ref_id,date_col_1 as entry_date,t_col_1 as received_by,d_col_1 as amount,t_col_2 as remark";
+        $queryData['where']['main_ref_id'] = $data['main_ref_id'];
+        $queryData['where']['table_name'] = $this->transMain;
+        $queryData['where']['description'] = "EST PAYMENT";
+        $result = $this->rows($queryData);
+        return $result;
+    }
+
+    public function getEstimatePayment($data){
+        $queryData = array();
+        $queryData['tableName'] = $this->transDetails;
+        $queryData['select'] = "id,main_ref_id,date_col_1 as entry_date,t_col_1 as received_by,d_col_1 as amount,t_col_2 as remark";
+        $queryData['where']['id'] = $data['id'];
+        $result = $this->row($queryData);
+        return $result;
+    }
+
+    public function deleteEstimatePayment($id){
+        try{
+            $this->db->trans_begin();
+            
+            $vouData = $this->getEstimatePayment(['id'=>$id]);
+
+            $setData = array();
+            $setData['tableName'] = $this->transMain;
+            $setData['where']['id'] = $vouData->main_ref_id;
+            $setData['set']['rop_amount'] = 'rop_amount, - '.$vouData->amount;
+            $this->setValue($setData);
+            
+            $result = $this->trash($this->transDetails,['id'=>$id],'Payment');
+
+            if ($this->db->trans_status() !== FALSE):
+                $this->db->trans_commit();
+                return $result;
+            endif;
+        }catch(\Throwable $e){
+            $this->db->trans_rollback();
+            return ['status'=>2,'message'=>"somthing is wrong. Error : ".$e->getMessage()];
+        }
+    }
 }
 ?>

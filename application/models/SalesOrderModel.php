@@ -260,7 +260,7 @@ class SalesOrderModel extends MasterModel{
     public function getPendingOrderItems($data){
         $queryData = array();
         $queryData['tableName'] = $this->transChild;
-        $queryData['select'] = "trans_child.*,(trans_child.qty - trans_child.dispatch_qty) as pending_qty,trans_main.entry_type as main_entry_type,trans_main.trans_number,trans_main.trans_date,trans_main.doc_no,IF(trans_child.packing_qty <> 0,trans_child.packing_qty,item_master.packing_standard) AS packing_qty";
+        $queryData['select'] = "trans_child.*,(trans_child.qty - trans_child.dispatch_qty) as pending_qty,trans_main.entry_type as main_entry_type,trans_main.trans_number,trans_main.trans_date,trans_main.doc_no,IF(trans_child.packing_qty <> 0,trans_child.packing_qty,item_master.packing_standard) AS packing_qty,item_master.size_id,item_master.color,item_master.capacity";
         $queryData['leftJoin']['trans_main'] = "trans_child.trans_main_id = trans_main.id";
         $queryData['leftJoin']['item_master'] = "trans_child.item_id = item_master.id";
         $queryData['where']['trans_main.party_id'] = $data['party_id'];

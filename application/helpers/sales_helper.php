@@ -229,17 +229,19 @@ function getPartyOrderData($data){
 function getEstimateData($data){
     $editButton = '<a class="btn btn-success btn-edit permission-modify" href="'.base_url('estimate/edit/'.$data->id).'" datatip="Edit" flow="down" ><i class="ti-pencil-alt"></i></a>';
 
-    $deleteParam = "{'postData':{'id' : ".$data->id."},'message' : 'Sales Invoice'}";
+    $deleteParam = "{'postData':{'id' : ".$data->id."},'message' : 'Estimate'}";
     $deleteButton = '<a class="btn btn-danger btn-delete permission-remove" href="javascript:void(0)" onclick="trash('.$deleteParam.');" datatip="Remove" flow="down"><i class="ti-trash"></i></a>';
 
-    $print = '';
-    //$print = '<a href="javascript:void(0)" class="btn btn-warning btn-edit printDialog permission-approve1" datatip="Print Invoice" flow="down" data-id="'.$data->id.'" data-fn_name="printInvoice"><i class="fa fa-print"></i></a>';
+    $printBtn = '<a class="btn btn-info btn-edit" href="'.base_url('estimate/printEstimate/'.$data->id).'" target="_blank" datatip="Print" flow="down"><i class="fas fa-print" ></i></a>';
+
+    $paymentParam = "{'postData':{'id' : ".$data->id."},'modal_id':'modal-lg','form_id':'estimatePayment','title':'Payment','fnedit':'estimatePayment','button':'close','res_function':'resSaveEstimatePayment'}";
+    $paymentBtn = '<a class="btn btn-warning btn-edit permission-modify" href="javascript:void(0)" datatip="Payment" flow="down" onclick="edit('.$paymentParam.');"><i class="fas fa-rupee-sign"></i></a>';
 
     if($data->trans_no == 0):
         $editButton = $deleteButton = "";
     endif;
 
-    $action = getActionButton($print.$editButton.$deleteButton);
+    $action = getActionButton($printBtn.$paymentBtn.$editButton.$deleteButton);
 
     return [$action,$data->sr_no,$data->trans_number,$data->trans_date,$data->party_name,$data->taxable_amount,$data->net_amount];
 }

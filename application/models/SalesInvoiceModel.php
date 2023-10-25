@@ -374,7 +374,8 @@ class SalesInvoiceModel extends MasterModel{
     public function getSalesInvoiceItems($data){
         $queryData = array();
         $queryData['tableName'] = $this->transChild;
-        $queryData['select'] = "trans_child.*";
+        $queryData['select'] = "trans_child.*,item_master.size_id,item_master.color,item_master.capacity";
+        $queryData['leftJoin']['item_master'] = "trans_child.item_id = item_master.id";
         $queryData['where']['trans_child.trans_main_id'] = $data['id'];
         $result = $this->rows($queryData);
         return $result;
