@@ -12,7 +12,7 @@ class StockTrans extends MY_Controller
 		$this->isLoggedin();
 		$this->data['headData']->pageTitle = "Fg Stock Inward";
 		$this->data['headData']->controller = "app/stockTrans";
-        $this->data['entryData'] = $this->transMainModel->getEntryType(['controller'=>'stockTrans']);
+        $this->data['entryData'] = $this->transMainModel->getEntryType(['controller'=>'stockTrans/stockRegister']);
 	}
 
 	public function index()
