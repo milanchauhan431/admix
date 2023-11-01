@@ -374,9 +374,21 @@ class SalesInvoiceModel extends MasterModel{
     public function getSalesInvoiceItems($data){
         $queryData = array();
         $queryData['tableName'] = $this->transChild;
-        $queryData['select'] = "trans_child.*,item_master.size_id,item_master.color,item_master.capacity";
+        $queryData['select'] = "trans_child.*,item_master.size_id,item_master.color,item_master.capacity,item_master.wkg";
         $queryData['leftJoin']['item_master'] = "trans_child.item_id = item_master.id";
         $queryData['where']['trans_child.trans_main_id'] = $data['id'];
+        $result = $this->rows($queryData);
+        return $result;
+    }
+
+    public function getSalesInvoiceItemsForPacking($data){
+        $queryData = array();
+        $queryData['tableName'] = $this->transChild;
+        $queryData['select'] = "SUM(trans_child.qty) as qty,trans_child.packing_qty,size_master.size,item_master.size_id,item_master.color,item_master.capacity,item_master.wkg";
+        $queryData['leftJoin']['item_master'] = "trans_child.item_id = item_master.id";
+        $queryData['leftJoin']['size_master'] = "item_master.size_id = size_master.id";
+        $queryData['where']['trans_child.trans_main_id'] = $data['id'];
+        $queryData['group_by'][] = "trans_child.item_id";
         $result = $this->rows($queryData);
         return $result;
     }

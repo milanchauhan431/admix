@@ -596,7 +596,7 @@ function initDataTable(){
 	return table;
 };
 
-function colseModal(formId){
+function closeModal(formId){
 	var modal_id = $("."+formId+"Modal").attr('id');
 	$("#"+modal_id).removeClass(formId+"Modal");
 	$("#"+modal_id+' .modal-body').html("");
@@ -628,7 +628,7 @@ function store(postData){
 		dataType:"json",
 	}).done(function(data){
 		if(data.status==1){
-			initTable(); $('#'+formId)[0].reset(); colseModal(formId);
+			initTable(); $('#'+formId)[0].reset(); closeModal(formId);
 			
 			toastr.success(data.message, 'Success', { "showMethod": "slideDown", "hideMethod": "slideUp", "closeButton": true, positionClass: 'toastr toast-bottom-center', containerId: 'toast-bottom-center', "progressBar": true });
 		}else{
@@ -731,7 +731,7 @@ function confirmStore(data){
 								initTable();
 
 								if(formId != ""){
-									$('#'+formId)[0].reset(); colseModal(formId);
+									$('#'+formId)[0].reset(); closeModal(formId);
 								}
 
 								toastr.success(response.message, 'Success', { "showMethod": "slideDown", "hideMethod": "slideUp", "closeButton": true, positionClass: 'toastr toast-bottom-center', containerId: 'toast-bottom-center', "progressBar": true });
@@ -756,6 +756,17 @@ function confirmStore(data){
             }
 		}
 	});
+}
+
+function newTabSubmit(postData){
+	setPlaceHolder();
+
+	var formId = postData.formId;
+	var fnsave = postData.fnsave || "save";
+	var controllerName = postData.controller || controller;
+	$("#"+formId).attr('action',base_url + controllerName + '/' + fnsave);
+	$("#"+formId+" #submit_btn").trigger('click');
+	closeModal(formId);
 }
 
 function edit(data){
@@ -1142,7 +1153,7 @@ function inrFormat(no){
 
 function resPartyMaster(response,formId){
 	if(response.status==1){
-        $('#'+formId)[0].reset();colseModal(formId);
+        $('#'+formId)[0].reset();closeModal(formId);
         toastr.success(response.message, 'Success', { "showMethod": "slideDown", "hideMethod": "slideUp", "closeButton": true, positionClass: 'toastr toast-bottom-center', containerId: 'toast-bottom-center', "progressBar": true });
 
 		getPartyList({"party_category":$("#party_id").data('party_category'),"party_type":($("#party_id").data('party_type') || 1)});
@@ -1163,7 +1174,7 @@ function resPartyMaster(response,formId){
 
 function resItemMaster(response,formId){
 	if(response.status==1){
-        $('#'+formId)[0].reset();colseModal(formId);
+        $('#'+formId)[0].reset();closeModal(formId);
         toastr.success(response.message, 'Success', { "showMethod": "slideDown", "hideMethod": "slideUp", "closeButton": true, positionClass: 'toastr toast-bottom-center', containerId: 'toast-bottom-center', "progressBar": true });
 
 		getItemList({"item_type":$("#item_id").data('item_type')});

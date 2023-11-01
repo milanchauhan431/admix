@@ -2,6 +2,7 @@
 class SalesInvoice extends MY_Controller{
     private $indexPage = "sales_invoice/index";
     private $form = "sales_invoice/form";    
+    private $packingPrintForm = "sales_invoice/packing_print_form";
 
     public function __construct(){
 		parent::__construct();
@@ -218,6 +219,32 @@ class SalesInvoice extends MY_Controller{
         $data = $this->input->post();
         $result = $this->salesInvoice->getPartyItemPrice($data);
         $this->printJson(['status'=>1,'price'=>((!empty($result))?$result->price:0),'org_price'=>((!empty($result))?$result->org_price:0),'data'=>$result]);
+    }
+
+    public function generatePackingPrint(){
+        $data = $this->input->post();
+        $this->data['inv_no'] = $data['inv_no'];
+        $this->data['itemList'] = $this->salesInvoice->getSalesInvoiceItemsForPacking(['id'=>$data['id']]);
+        $this->load->view($this->packingPrintForm,$this->data);
+    }
+
+    public function packingPrint(){
+        $data = $this->input->post();
+
+        $this->data['postData'] = $data;
+        $pdfData = $this->load->view('sales_invoice/packing_print',$this->data,true);
+        
+        $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8', 'format' => [125, 130]]);
+		$pdfFileName = "PCK_".str_replace(["/","-"," "],"_",$data['inv_no']).'.pdf';
+        $stylesheet = file_get_contents(base_url('assets/css/pdf_style.css?v='.time()));
+		$mpdf->SetTitle($pdfFileName);
+        $mpdf->WriteHTML($stylesheet,1);
+		$mpdf->SetDisplayMode('fullpage');
+		$mpdf->SetProtection(array('print'));
+		$mpdf->AddPage('P','','','','',5,5,5,5,5,5);
+        
+		$mpdf->WriteHTML($pdfData);
+		$mpdf->Output($pdfFileName,'I');
     }
 }
 ?>

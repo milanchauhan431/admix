@@ -98,6 +98,9 @@ function getSalesInvoiceData($data){
 
     $print = '<a href="javascript:void(0)" class="btn btn-info btn-edit printDialog permission-approve1" datatip="Print Invoice" flow="down" data-id="'.$data->id.'" data-fn_name="printInvoice"><i class="fa fa-print"></i></a>';
 
+    $packingParam = "{'postData':{'id' : ".$data->id.",'inv_no':'".$data->trans_number."'}, 'modal_id' : 'modal-lg', 'form_id' : 'packingPrint', 'title' : 'Packing Print For Invoice No. : ".($data->trans_number)."', 'fnedit' : 'generatePackingPrint', 'fnsave' : 'packingPrint', 'js_store_fn' : 'newTabSubmit','savebtn_text':'Print'}";
+    $packingPrint = '<a class="btn btn-primary" href="javascript:void(0)" onclick="edit('.$packingParam.');" datatip="Packing Print" flow="down"><i class="icon-Gift-Box"></i></a>';
+
     $ewbPDF = '';$ewbDetailPDF = '';$generateEWB = '';  $cancelEwb = '';
     $ewbParam = "{'postData':{'id' : ".$data->id.",'party_id' : ".$data->party_id."}, 'modal_id' : 'modal-xl', 'form_id' : 'generateEwayBill', 'title' : 'E-way Bill For Invoice No. : ".($data->trans_number)."', 'fnedit' : 'addEwayBill', 'fnsave' : 'generateEwb', 'js_store_fn' : 'generateEwb','controller':'ebill','syncBtn':1}";
 
@@ -139,7 +142,7 @@ function getSalesInvoiceData($data){
         $editButton="";$deleteButton="";$generateEinv = "";$generateEWB = '';  $cancelEwb = '';
     endif;//$cancelInv = "";
 
-    $action = getActionButton($print.$ewbPDF.$ewbDetailPDF.$generateEWB.$cancelEwb.$editButton.$deleteButton);
+    $action = getActionButton($print.$packingPrint.$ewbPDF.$ewbDetailPDF.$generateEWB.$cancelEwb.$editButton.$deleteButton);
 
     return [$action,$data->sr_no,$data->trans_number,formatDate($data->trans_date),$data->party_name,$data->taxable_amount,$data->gst_amount,$data->net_amount];
 }
