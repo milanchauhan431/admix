@@ -86,6 +86,7 @@
                 </tr>
             </table>
             
+            <?php if(!empty($ewbData->json_data->transMode)): ?>
             <table class="table table-bordered m-b-5">
                 <tr>
                     <th class="text-center bg-light" colspan="7">PART - B</th>
@@ -100,7 +101,7 @@
                     <th>Multi Veh. Info (If any)</th>
                 </tr>
                 <tr>
-                    <td><?=$trans_mode[$ewbData->json_data->transMode]?></td>
+                    <td><?=(!empty($ewbData->json_data->transMode))?$trans_mode[$ewbData->json_data->transMode]:"-"?></td>
                     <td><?=((!empty($ewbData->json_data->vehicleNo)) ? $ewbData->json_data->vehicleNo : $ewbData->json_data->transporterId)?></td>
                     <td><?=$ewbData->json_data->fromPlace?></td>
                     <td><?=date("d/m/Y<\b\\r />h:i:s A",strtotime($ewbData->eway_bill_date))?></td>
@@ -109,6 +110,7 @@
                     <td>-</td>
                 </tr>
             </table>
+            <?php endif; ?>
 
             <div class="barcode text-center m-b-5 m-t-5">
                 <barcode code="601494400839" type="C128A" height="1" text="1" /><br>

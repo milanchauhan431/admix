@@ -7814,3 +7814,23 @@ body.dark-mode.rtl-mode .notification-dialog.android-style .notification-footer 
     padding: 3px 5px;    
     border:1px solid #DCDCE9 !important;
 }
+
+/**** Floating Button ***/
+.floatingButon{
+	position:fixed;
+	width:50px;
+	height:50px;
+	bottom:70px;
+	right:15px;
+	background-color:#00cC99;
+	color:#FFF;
+	border-radius:50px;
+	text-align:center;
+	box-shadow: 2px 2px 3px #999;
+}
+.floatingButon:hover{background-color:#05b88b;}
+.floatingButon .floating-icon{
+	font-size:18px;
+	line-height:50px;
+	color:#FFF;
+}

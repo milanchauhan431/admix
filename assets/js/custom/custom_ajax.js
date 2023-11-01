@@ -105,7 +105,7 @@ function ssDatatable(ele,tableHeaders,tableOptions,dataSet={}){
 		destroy: true,
 		//'stateSave':true,
 		"autoWidth" : false,
-		pageLength: 50,
+		pageLength: 100,
 		/* "rowCallback": function (nRow, aData, iDisplayIndex) {
 			var oSettings = this.fnSettings ();
 			console.log(nRow);

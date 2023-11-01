@@ -10,7 +10,7 @@ class StockTransModel extends MasterModel{
 
         $data['where']['stock_transaction.p_or_m'] = 1;
 
-
+        if(!empty($data['item_type']))$data['where']['item_master.item_type'] = $data['item_type'];
         $data['where']['stock_transaction.ref_date >='] = ("2023-10-18" < $this->startYearDate)?$this->startYearDate:"2023-10-18";
         //$data['where']['stock_transaction.ref_date >='] = $this->startYearDate;
         $data['where']['stock_transaction.ref_date <='] = $this->endYearDate;

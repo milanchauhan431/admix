@@ -45,9 +45,9 @@
             </div>
             <div class="col-md-4 form-group">
                 <label for="trans_mode">Transport Mode</label>
-                <select name="trans_mode" id="trans_mode" class="form-control req">
+                <select name="trans_mode" id="trans_mode" class="form-control">
                     <option value="">Select</option>
-                    <option value="1" selected>Road</option>
+                    <option value="1">Road</option>
                     <option value="2">Rail</option>
                     <option value="3">Air</option>
                     <option value="4">Ship</option>
@@ -59,7 +59,7 @@
             </div>            
             <div class="col-md-4 form-group">
                 <label>Transporter Name</label>
-                <select name="transport_name" id="transport_name" class="form-control single2 transport_name req">
+                <select name="transport_name" id="transport_name" class="form-control select2 transport_name req">
                     <option value="">Select Transporter</option>
                     <?php
                     foreach ($transportData as $row) :

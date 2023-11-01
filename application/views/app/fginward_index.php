@@ -11,7 +11,7 @@
 		<a href="#" class="headerButton toggle-searchbox text-white">
 			<ion-icon name="search-outline" role="img" class="md hydrated searchbtn" aria-label="search outline"></ion-icon>
 		</a>
-		<a href="javascript:void(0)" class="headerButton  text-white addNew"  data-button="both" data-modal_id="actionSheetForm" data-function="addStock" data-form_title="Add FG STock" data-savecontroller="stockTrans">
+		<a href="javascript:void(0)" class="headerButton text-white addNew" data-button="both" data-modal_id="actionSheetForm" data-function="addStock" data-form_title="Add FG STock" data-savecontroller="stockTrans">
 			<ion-icon name="add-outline" role="img" class="md hydrated " aria-label="Add Approach"></ion-icon>
 		</a>
 	</div>
@@ -80,6 +80,7 @@
 		</ul>
 	</div>
 </div>
+<a href="#" class="floatingButon addNew" data-button="both" data-modal_id="actionSheetForm" data-function="addStock" data-form_title="Add FG STock" data-savecontroller="stockTrans"><i class="fa fa-plus floating-icon"></i></a>
 <!-- End Main Content -->
 
 

@@ -34,8 +34,8 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn waves-effect waves-light btn-outline-danger btn-close save-form square" data-bs-dismiss="modal"><i class="fa fa-times"></i>Close</button>
-                <button type="button" class="btn waves-effect waves-light btn-outline-success btn-save save-form square"><i class="fa fa-check"></i>Save</button>
+				<button type="button" class="btn waves-effect waves-light btn-outline-danger btn-close1 save-form square" data-bs-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                <button type="button" class="btn waves-effect waves-light btn-outline-success btn-save save-form square"><i class="fa fa-check"></i> Save</button>
 			</div>
 		</div>
 	</div>

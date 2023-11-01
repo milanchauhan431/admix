@@ -64,11 +64,11 @@ class SalesInvoice extends MY_Controller{
         else:
             $bQty = array();
             foreach($data['itemData'] as $key => $row):
-                if(!empty(floatVal($row['qty'])) && !empty($row['size'])):
+                /*if(!empty(floatVal($row['qty'])) && !empty($row['packing_qty'])):
                     if(is_int(($row['qty'] / $row['packing_qty'])) == false):
                         $errorMessage['qty'.$key] = "Invalid qty against packing standard.";
                     endif;
-                endif;
+                endif;*/
 
                 if($row['stock_eff'] == 1):
                     $postData = ['location_id' => $this->RTD_STORE->id,'batch_no' => $row['brand_name'],'item_id' => $row['item_id'],'stock_required'=>1,'single_row'=>1];

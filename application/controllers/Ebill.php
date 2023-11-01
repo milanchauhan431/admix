@@ -179,8 +179,8 @@ class Ebill extends MY_Controller{
             $errorMessage['supply_type'] = "Supply Type is required.";
         if(empty($data['sub_supply_type']))
             $errorMessage['sub_supply_type'] = "Sub Supply Type is required.";
-        if(empty($data['trans_mode']))
-            $errorMessage['trans_mode'] = "Transport Mode is required.";
+        /* if(empty($data['trans_mode']))
+            $errorMessage['trans_mode'] = "Transport Mode is required."; */
         if(empty($data['trans_distance']))
             $errorMessage['trans_distance'] = "Trans. Distance is required.";
         if(empty($data['vehicle_no']) && empty($data['transport_name']))

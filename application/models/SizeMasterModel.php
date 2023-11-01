@@ -85,6 +85,7 @@ class SizeMasterModel extends MasterModel{
 
     public function getSizeList($data=array()){
         $queryData['tableName'] = $this->sizeMaster;
+        $queryData['order_by']['size']='ASC';
         return $this->rows($queryData);
     }
 }

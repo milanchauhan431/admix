@@ -111,6 +111,8 @@ function getSalesInvoiceData($data){
         else:
             $cancelEwbParam = "{'postData':{'id' : ".$data->id."}, 'modal_id' : 'modal-md', 'form_id' : 'cancelEwb', 'title' : 'Cancel Eway Bill [ Invoice No. : ".($data->trans_number)." ]', 'fnedit' : 'loadCancelEwayBillForm', 'fnsave' : 'cancelEwayBill', 'js_store_fn' : 'cancelEwayBill','controller':'ebill','syncBtn':0,'save_btn_text':'Cancel EWB'}";
             $cancelEwb = '<a href="javascript:void(0)" class="btn btn-danger" datatip="Cancel Eway Bill" flow="down" onclick="ebillFrom('.$cancelEwbParam.');"><i class="fa fa-times"></i></a>';
+
+            $editButton="";$deleteButton="";
         endif;
     else:
         if(empty($data->eway_bill_no)):
@@ -134,7 +136,7 @@ function getSalesInvoiceData($data){
         $cancelInvParam = "{'postData':{'id' : ".$data->id."}, 'modal_id' : 'modal-md', 'form_id' : 'cancelInv', 'title' : 'Cancel Invoice No. : ".$data->trans_number."', 'fnedit' : 'loadCancelInvForm', 'fnsave' : 'cancelEinvoice', 'js_store_fn' : 'cancelEinv','controller':'ebill','syncBtn':0,'save_btn_text':'Cancel Invoice'}";
         $cancelInv = '<a href="javascript:void(0)" class="btn btn-danger" datatip="Cancel Invoice" flow="down" onclick="ebillFrom('.$cancelInvParam.');"><i class="fa fa-times"></i></a>';
     else:
-        $edit="";$delete="";$generateEinv = "";$generateEWB = '';  $cancelEwb = '';
+        $editButton="";$deleteButton="";$generateEinv = "";$generateEWB = '';  $cancelEwb = '';
     endif;//$cancelInv = "";
 
     $action = getActionButton($print.$ewbPDF.$ewbDetailPDF.$generateEWB.$cancelEwb.$editButton.$deleteButton);

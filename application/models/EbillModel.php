@@ -32,7 +32,7 @@ class EbillModel extends MasterModel{
         ];
 
         
-        $partyData = $this->party->getParty($invData->party_id);    
+        $partyData = $this->party->getParty(['id'=>$invData->party_id]);    
         $postData['partyInfo'] = [
             'name' => $partyData->party_name,
             'gst_no' => (!empty($partyData->gstin))?$partyData->gstin:"URP",

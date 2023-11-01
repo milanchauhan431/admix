@@ -25,6 +25,7 @@ class StockTrans extends MY_Controller{
     public function getDTRows($status = 0){
         $data = $this->input->post();
         $data['entry_type'] = $this->data['entryData']->id;
+        $data['item_type']=1;
         $result = $this->itemStock->getDTRows($data);
         $sendData = array();$i=($data['start']+1);
         foreach($result['data'] as $row):
@@ -67,11 +68,11 @@ class StockTrans extends MY_Controller{
 
             $data['item_id'] = $itemDetail->id;
             $data['size'] = $itemDetail->packing_standard;
-            if(!empty(floatVal($data['qty'])) && !empty($data['size'])):
+            /* if(!empty(floatVal($data['qty'])) && !empty($data['size'])):
                 if(is_int(($data['qty'] / $data['size'])) == false):
                     $errorMessage['qty'] = "Invalid qty against packing standard.";
                 endif;
-            endif;
+            endif; */
         endif;
 
         if(!empty($errorMessage)):

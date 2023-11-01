@@ -546,7 +546,7 @@ function ssTableInit(){
 	var tableId = $('.ssTable').attr('id');
 	$("#"+tableId).data("hp_fn_name","");
     $("#"+tableId).data("page","");
-	var tableOptions = {pageLength: 25,'stateSave':false};
+	var tableOptions = {pageLength: 100,'stateSave':false};
     ssDatatable($('.ssTable'),tableHeaders,tableOptions);
 }
 
@@ -564,7 +564,7 @@ function initTable(postData = {}){
 			data : {'hp_fn_name':hp_fn_name,'page':page},
 			dataType: 'json',
 			success: function(response) {
-				var tableOptions = {pageLength: 25,'stateSave':false};
+				var tableOptions = {pageLength: 100,'stateSave':false};
 				var dataSet = postData;
 				var tableHeaders = response.data;
 				tableHeaders.reInit = 1;
@@ -577,7 +577,7 @@ function initTable(postData = {}){
 			}
 		});
 	}else{
-		var tableOptions = {pageLength: 25,'stateSave':false};
+		var tableOptions = {pageLength: 100,'stateSave':false};
 		var tableHeaders = {'theads':'','textAlign':textAlign,'sortable':sortable,'reInit':'1'};
 		var dataSet = postData;
 		ssDatatable($('.ssTable'),tableHeaders,tableOptions,dataSet);

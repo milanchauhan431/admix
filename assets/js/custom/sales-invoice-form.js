@@ -77,21 +77,21 @@ $(document).ready(function(){
         if (formData.price == "" || parseFloat(formData.price) == 0) {
             $(".price").html("Price is required.");
         }
-		if(formData.packing_qty == "" || parseInt(formData.packing_qty) == 0){
+		/*if(formData.packing_qty == "" || parseInt(formData.packing_qty) == 0){
 			$(".packing_qty").html("Packing standard is required.");
-		}
+		}*/
 
         /* var item_ids = $(".item_id").map(function () { return $(this).val(); }).get();
         if ($.inArray(formData.item_id, item_ids) >= 0 && formData.row_index == "") {
             $(".item_name").html("Item already added.");
         } */
 
-		if(parseFloat(formData.qty) > 0 && parseInt(formData.packing_qty) > 0){
+		/*if(parseFloat(formData.qty) > 0 && parseInt(formData.packing_qty) > 0){
 			var totalBox = parseFloat(parseFloat(formData.qty) / parseFloat(formData.packing_qty));
 			if(!Number.isInteger(totalBox)){
 				$(".qty").html("Invalid qty against packing standard.");
 			}
-		}
+		}*/
 
         var errorCount = $('#itemForm .error:not(:empty)').length;
 

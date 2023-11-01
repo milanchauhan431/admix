@@ -27,7 +27,7 @@
 									<label for="triplicate">Triplicate</label>
 								</div>
 								<div class="custom-control custom-checkbox">
-									<input type="checkbox" name="header_footer" id="header_footer" class="filled-in chk-col-success" value="1" checked>
+									<input type="checkbox" name="header_footer" id="header_footer" class="filled-in chk-col-success" value="1">
 									<label for="header_footer">Header/Footer</label>
 								</div>
 							</div>
