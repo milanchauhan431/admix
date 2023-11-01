@@ -15,7 +15,8 @@
                             </div>       
                             <div class="col-md-4 float-right"> 
 								<input type="hidden" id="item_type" value="1" />
-								<input type="hidden" id="stock_type" class="loadData" value="1" />   
+								<input type="hidden" id="stock_type" value="1" />  
+								<button class="loadData refreshReportData hidden"></button> 
 							</div>								
                         </div>                                         
                     </div>
@@ -48,9 +49,9 @@
 <script>
 $(document).ready(function(){
 	reportTable();
-    setTimeout(function(){$(".loadData").trigger('keyup');},500);
+    setTimeout(function(){$(".loadData").trigger('click');},500);
     
-    $(document).on('keyup','.loadData',function(e){
+    $(document).on('click','.loadData',function(e){
 		$(".error").html("");
 		var valid = 1;
 		var item_type = $('#item_type').val();

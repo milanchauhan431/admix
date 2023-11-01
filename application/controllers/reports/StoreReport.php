@@ -19,7 +19,7 @@ class StoreReport extends MY_Controller{
 
         $tbody = '';$i=1;
         foreach($result as $row):
-			$box_qty = (!empty(floatVal($row->stock_qty)))? (floatVal($row->stock_qty) / $row->packing_standard) : 0;
+			$box_qty = (!empty(floatVal($row->stock_qty)))? ceil((floatVal($row->stock_qty) / $row->packing_standard)) : 0;
             $tbody .= '<tr>
                 <td class="text-center">'.$i++.'</td>
                 <td class="text-left">
@@ -30,7 +30,7 @@ class StoreReport extends MY_Controller{
 						'.floatVal($row->stock_qty).'
 					</a>
 				</td>
-				<td class="text-right">'.round($box_qty,0).'</td>
+				<td class="text-right">'.$box_qty.'</td>
             </tr>';
         endforeach;
 
