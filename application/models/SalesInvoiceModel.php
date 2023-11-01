@@ -463,7 +463,7 @@ class SalesInvoiceModel extends MasterModel{
     public function getPartyBillPer($data){
         $queryData = array();
         $queryData['tableName'] = $this->transMain;
-        $queryData['select'] = "trans_main.id,trans_details.i_col_1 as bill_per";
+        $queryData['select'] = "trans_main.id,trans_details.i_col_1 as bill_per,trans_details.i_col_2 as transport_id,trans_details.t_col_4 as transaport_name,trans_details.t_col_5 as transaport_gst_no";
         $queryData['leftJoin']['trans_details'] = "trans_main.id = trans_details.main_ref_id AND trans_details.description = 'SI MASTER DETAILS' AND trans_details.table_name = '".$this->transMain."'";
         $queryData['where']['trans_main.party_id'] = $data['party_id'];
         $queryData['where']['trans_main.entry_type'] = $this->data['entryData']->id;

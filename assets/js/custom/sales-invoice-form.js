@@ -598,6 +598,10 @@ function resPartyDetail(response = ""){
         });
 		
 		$("#master_i_col_1").val("");
+		$("#master_i_col_2").val("");
+		$("#master_i_col_2").select2();
+		$("#master_t_col_4").val("");
+		$("#master_t_col_5").val("");
 		$.ajax({
 			url : base_url + controller + '/getPartyBillPer',
 			type:'post',
@@ -605,6 +609,10 @@ function resPartyDetail(response = ""){
 			dataType : 'json',
 			success:function(res){
 				$("#master_i_col_1").val(res.bill_per);
+				$("#master_i_col_2").val(res.data.transport_id);
+				$("#master_i_col_2").select2();
+				$("#master_t_col_4").val(res.data.transaport_name);
+				$("#master_t_col_5").val(res.data.transaport_gst_no);
 			}
 		});
     }else{
@@ -613,6 +621,10 @@ function resPartyDetail(response = ""){
         $("#master_t_col_2").val("");
         $("#master_t_col_3").val("");
 		$("#master_i_col_1").val("");
+		$("#master_i_col_2").val("");
+		$("#master_i_col_2").select2();
+		$("#master_t_col_4").val("");
+		$("#master_t_col_5").val("");
     }
     $("#gstin").html(html);$("#gstin").select2();gstin();
 }

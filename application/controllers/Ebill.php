@@ -70,12 +70,17 @@ class Ebill extends MY_Controller{
 	/* Load From For new Eway Bill */
     public function addEwayBill(){
         $party_id = $this->input->post('party_id');
+		$ref_id = $this->input->post('id');
+
         $partyData = $this->party->getParty($party_id);
-        $this->data['ref_id'] = $this->input->post('id');
+		$invoiceData = $this->salesInvoice->getSalesInvoice(['id'=>$ref_id,'itemList'=>0]);
+
+        $this->data['ref_id'] = $ref_id;
         $this->data['party_id'] = $party_id;
         $this->data['transportData'] = $this->transport->getTransportList();
         $this->data['stateList'] = $this->party->getStates(['country_id'=>101]);
         $this->data['partyData'] = $partyData;
+		$this->data['invoiceData'] = $invoiceData;
         $this->load->view("e_bill/eway_bill_form",$this->data);
     }
 

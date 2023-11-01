@@ -63,7 +63,8 @@
                     <option value="">Select Transporter</option>
                     <?php
                     foreach ($transportData as $row) :
-                        echo '<option value="' . $row->transport_name . '" data-val="' . $row->transport_id . '">' . $row->transport_name . '</option>';
+                        $selected = ((!empty($invoiceData->transport_id)) && $invoiceData->transport_id == $row->id)?"selected":"";
+                        echo '<option value="' . $row->transport_name . '" data-val="' . $row->transport_id . '" '.$selected.'>' . $row->transport_name . '</option>';
                     endforeach;
                     ?>
                 </select>
@@ -169,3 +170,10 @@
         </div>
     </div>
 </form>
+<script>
+$(document).ready(function(){
+    setTimeout(function(){
+        $("#transport_name").trigger('change');
+    },500);
+});
+</script>

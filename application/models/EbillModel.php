@@ -15,6 +15,10 @@ class EbillModel extends MasterModel{
         $cityDataFrom = $this->party->getCity(['id'=>$ewbData['from_city']]);
         $cityDataTo = $this->party->getCity(['id'=>$ewbData['ship_city']]);
 
+        if(!empty($ewbData['trans_distance'])):
+            $this->edit('party_master',['id'=>$invData->party_id],['distance'=>$ewbData['trans_distance']]);
+        endif;
+
         $postData['Gstin'] = $orgData->company_gst_no;
         $postData['companyInfo'] = [
             'name' => $orgData->company_name,

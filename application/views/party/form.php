@@ -97,12 +97,12 @@
                 <input type="text" name="gstin" class="form-control text-uppercase req" value="<?=(!empty($dataRow->gstin))?$dataRow->gstin:""; ?>" />
             </div>	
             		
-            <div class="col-md-3 form-group">
+            <div class="<?=($party_category != 1)?"col-md-3":"col-md-2"?> form-group">
                 <label for="pan_no">Party PAN</label>
                 <input type="text" name="pan_no" class="form-control text-uppercase" value="<?=(!empty($dataRow->pan_no))?$dataRow->pan_no:""?>" />
             </div>
 			
-            <div class="col-md-3 form-group">
+            <div class="<?=($party_category != 1)?"col-md-3":"col-md-2"?> form-group">
                 <label for="currency">Currency</label>
                 <select name="currency" id="currency" class="form-control select2">
                     <option value="">Select Currency</option>
@@ -113,6 +113,11 @@
                         <option value="<?=$row->currency?>" <?=$selected?>><?=$row->currency?> [<?=$row->code2000?> - <?=$row->currency_name?>]</option>
                     <?php endforeach; ?>
                 </select>
+            </div>
+
+            <div class="col-md-2 form-group <?=($party_category != 1)?"hidden":""?>">
+                <label for="distance">Distance (Km)</label>
+                <input type="text" name="distance" id="distance" class="form-control numericOnly" value="<?=(!empty($dataRow->distance))?floatVal($dataRow->distance):""?>">
             </div>
             
             <div class="col-md-3 form-group">
