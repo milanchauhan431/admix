@@ -82,7 +82,7 @@
                 </tr>
                 <tr>
                     <th>Transporter </th>				
-                    <td><?=$ewbData->json_data->transporterId?></td>
+                    <td><?=$ewbData->json_data->transporterId.' - '.$ewbData->json_data->transporterName?></td>
                 </tr>
             </table>
             
