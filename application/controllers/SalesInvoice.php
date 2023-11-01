@@ -134,9 +134,13 @@ class SalesInvoice extends MY_Controller{
         endif;
     }
 
-    public function printInvoice($id="",$type=""){
-        $postData = $this->input->post();
-        //print_r($postData);exit;
+    public function printInvoice($jsonData=""){
+        if(!empty($jsonData)):
+            $postData = (Array) decodeURL($jsonData);
+        else: 
+            $postData = $this->input->post();
+        endif;
+        
         $printTypes = array();
         if(!empty($postData['original'])):
             $printTypes[] = "ORIGINAL";
@@ -184,7 +188,8 @@ class SalesInvoice extends MY_Controller{
 		$mpdf = new \Mpdf\Mpdf();
 		$pdfFileName = str_replace(["/","-"," "],"_",$invData->trans_number).'.pdf';
         $stylesheet = file_get_contents(base_url('assets/css/pdf_style.css?v='.time()));
-		$mpdf->WriteHTML($stylesheet,1);
+		$mpdf->SetTitle($pdfFileName); 
+        $mpdf->WriteHTML($stylesheet,1);
 		$mpdf->SetDisplayMode('fullpage');
 		$mpdf->SetWatermarkImage($logo,0.03,array(120,45));
 		$mpdf->showWatermarkImage = true;

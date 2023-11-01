@@ -312,7 +312,8 @@ class Ebill extends MY_Controller{
 			$pdfFileName = $filePath.'/'.$fileName;
 			$stylesheet = file_get_contents(base_url('assets/css/epdf_style.css'));
 
-			$mpdf = new \Mpdf\Mpdf();            
+			$mpdf = new \Mpdf\Mpdf();      
+			$mpdf->SetTitle($fileName);      
 			$mpdf->WriteHTML($stylesheet, 1);
 			$mpdf->SetDisplayMode('fullpage');
 			/* if($ewbData->cancel_reason > 0):

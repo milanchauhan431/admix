@@ -1,7 +1,11 @@
-var itemCount = 0;
+var itemCount = 0;var inv_print = 0;
 $(document).ready(function(){
 	$(".ledgerColumn").hide();
 	$(".summary_desc").attr('style','width: 60%;');
+
+	$(document).on('click','#savePrint',function(){
+		inv_print = 1;
+	});
 	
 	$("#itemForm .select2").select2();
 	$(document).on('click','.getPendingOrders',function(){
@@ -662,7 +666,13 @@ function resSaveInvoice(data,formId){
         $('#'+formId)[0].reset();
         toastr.success(data.message, 'Success', { "showMethod": "slideDown", "hideMethod": "slideUp", "closeButton": true, positionClass: 'toastr toast-bottom-center', containerId: 'toast-bottom-center', "progressBar": true });
 
-        window.location = base_url + controller;
+		if(inv_print == 1){
+			var postData = {id:data.id,original:1,duplicate:1,triplicate:0,extra_copy:0,header_footer:0}; 
+			var url = base_url + controller + '/printInvoice/' + encodeURIComponent(window.btoa(JSON.stringify(postData)));
+			window.open(url);
+		}
+
+        window.location = base_url + controller;		
     }else{
         if(typeof data.message === "object"){
             $(".error").html("");

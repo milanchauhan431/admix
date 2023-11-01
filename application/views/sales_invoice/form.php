@@ -393,7 +393,10 @@
                     </div>
                     <div class="card-footer">
                         <div class="col-md-12">
-                            <button type="button" class="btn waves-effect waves-light btn-outline-success float-right save-form" onclick="customStore({'formId':'saveSalesInvoice'});" ><i class="fa fa-check"></i> Save</button>
+                            <button type="button" id="savePrint" class="btn waves-effect waves-light btn-outline-primary float-right save-form " onclick="customStore({'formId':'saveSalesInvoice'});" ><i class="fa fa-print"></i> Save & Print</button>
+
+                            <button type="button" class="btn waves-effect waves-light btn-outline-success float-right save-form m-r-10" onclick="customStore({'formId':'saveSalesInvoice'});" ><i class="fa fa-check"></i> Save</button>
+
                             <a href="javascript:void(0)" onclick="window.location.href='<?=base_url($headData->controller)?>'" class="btn waves-effect waves-light btn-outline-secondary float-right btn-close press-close-btn save-form" style="margin-right:10px;"><i class="fa fa-times"></i> Cancel</a>
                         </div>
                     </div>
