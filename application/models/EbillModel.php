@@ -113,7 +113,7 @@ class EbillModel extends MasterModel{
         $billData['dispatchFromTradeName'] = "";
         $billData['shipToGSTIN'] = "";
         $billData['shipToTradeName'] = "";
-        $billData["otherValue"] = floatVal(round($invData->net_amount - ($invData->taxable_amount + $invData->igst_amount),2));
+        $billData["otherValue"] = floatVal(round($invData->net_amount - ($invData->taxable_amount + $invData->gst_amount),2));
         $billData["totalValue"] = floatVal($invData->taxable_amount);
         $billData["cgstValue"] = ($cityDataTo->state_code == $orgData->company_state_code)?floatVal($invData->cgst_amount):0;
         $billData["sgstValue"] = ($cityDataTo->state_code == $orgData->company_state_code)?floatVal($invData->sgst_amount):0;

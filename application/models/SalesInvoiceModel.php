@@ -264,6 +264,8 @@ class SalesInvoiceModel extends MasterModel{
                 $row->from_entry_type = $row->entry_type;
                 $row->entry_type = $entryData->id;
 
+                unset($row->size_id,$row->color,$row->capacity,$row->wkg);
+
                 $row->stock_eff = 0;
                 $row->gst_per = 0;
                 $row->gst_amount = 0;

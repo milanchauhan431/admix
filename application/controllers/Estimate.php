@@ -3,6 +3,8 @@ class Estimate extends MY_Controller{
     private $indexPage = "estimate/index";
     private $form = "estimate/form"; 
     private $paymentForm = "estimate/estimate_payment";
+    private $estimate_ledger = "estimate/estimate_ledger";
+    private $estimate_ledger_details = "estimate/estimate_ledger_details";
 
     public function __construct(){
 		parent::__construct();
@@ -201,6 +203,241 @@ class Estimate extends MY_Controller{
             $this->printJson(['status'=>0,'message'=>'Somthing went wrong...Please try again.']);
         else:
             $this->printJson($this->estimate->deleteEstimatePayment($id));
+        endif;
+    }
+
+    public function ledger(){
+        $this->data['startDate'] = $this->startYearDate;
+        $this->data['endDate'] = $this->endYearDate;
+        $this->load->view($this->estimate_ledger,$this->data);
+    }
+
+    public function getLedger($jsonData=""){
+        if(!empty($jsonData)):
+            $postData = (Array) decodeURL($jsonData);
+        else: 
+            $postData = $this->input->post();
+        endif;
+
+        $ledgerSummary = $this->estimate->getLedgerSummary($postData);
+        $i=1; $tbody="";
+        foreach($ledgerSummary as $row):
+            if(empty($jsonData)):
+                $accountName = '<a href="' . base_url('estimate/ledgerDetail/' . $row->party_id) . '" target="_blank" datatip="Account Details" flow="down"><b>'.$row->party_name.'</b></a>';
+            else:
+                $accountName = $row->party_name;
+            endif;
+
+            if($row->op_balance > 0): $row->op_balance = $row->op_balance ." Cr.";
+            elseif($row->op_balance < 0): $row->op_balance = abs($row->op_balance) ." Dr.";
+            endif;
+
+            if($row->cl_balance > 0): $row->cl_balance = $row->cl_balance ." Cr.";
+            elseif($row->cl_balance < 0): $row->cl_balance = abs($row->cl_balance) ." Dr.";
+            endif;
+
+            $tbody .= '<tr>
+                <td>'.$i++.'</td>
+                <td class="text-left">'.$accountName.'</td>
+                <td class="text-right">'.$row->op_balance.'</td>
+                <td class="text-right">'.$row->cl_balance.'</td>
+            </tr>';
+        endforeach;         
+        
+        if(!empty($postData['pdf'])):
+            $reportTitle = 'ACCOUNT LEDGER';
+            $report_date = date('d-m-Y',strtotime($postData['from_date'])).' to '.date('d-m-Y',strtotime($postData['to_date']));   
+            $thead = (empty($jsonData)) ? '<tr class="text-center"><th colspan="11">'.$reportTitle.' ('.$report_date.')</th></tr>' : '';
+            $thead .= '<tr>
+                <th>#</th>
+                <th class="text-left">Account Name</th>
+                <th class="text-right">Opening Amount</th>
+                <th class="text-right">Closing Amount</th>
+            </tr>';
+
+            $companyData = $this->masterModel->getCompanyInfo();
+            $logoFile = (!empty($companyData->company_logo)) ? $companyData->company_logo : 'logo.png';
+            $logo = base_url('assets/images/' . $logoFile);
+            $letter_head = base_url('assets/images/letterhead_top.png');
+            
+            $pdfData = '<table class="table table-bordered item-list-bb" repeat_header="1">
+                <thead class="thead-info" id="theadData">'.$thead.'</thead>
+                <tbody>'.$tbody.'</tbody>
+            </table>';
+            $htmlHeader = '<table class="table" style="border-bottom:1px solid #036aae;">
+                <tr>
+                    <td class="org_title text-uppercase text-left" style="font-size:1rem;width:30%">'.$reportTitle.'</td>
+                    <td class="org_title text-uppercase text-center" style="font-size:1.3rem;width:40%">'.$companyData->company_name.'</td>
+                    <td class="org_title text-uppercase text-right" style="font-size:1rem;width:30%">'.$report_date.'</td>
+                </tr>
+            </table>
+            <table class="table" style="border-bottom:1px solid #036aae;margin-bottom:2px;">
+                <tr><td class="org-address text-center" style="font-size:13px;">'.$companyData->company_address.'</td></tr>
+            </table>';
+            $htmlFooter = '<table class="table top-table" style="margin-top:10px;border-top:1px solid #545454;">
+                <tr>
+                    <td style="width:50%;font-size:12px;">Printed On ' . date('d-m-Y') . '</td>
+                    <td style="width:50%;text-align:right;font-size:12px;">Page No. {PAGENO}/{nbpg}</td>
+                </tr>
+            </table>';
+
+            $mpdf = new \Mpdf\Mpdf();
+            $filePath = realpath(APPPATH . '../assets/uploads/');
+            $pdfFileName = $filePath.'/AccountLedger.pdf';
+            $stylesheet = file_get_contents(base_url('assets/css/pdf_style.css?v='.time()));
+            $mpdf->WriteHTML($stylesheet, 1);
+            $mpdf->SetDisplayMode('fullpage');
+            $mpdf->SetWatermarkImage($logo, 0.08, array(120, 120));
+            $mpdf->showWatermarkImage = true;
+            $mpdf->SetTitle($reportTitle);
+            $mpdf->SetHTMLHeader($htmlHeader);
+            $mpdf->SetHTMLFooter($htmlFooter);
+            $mpdf->AddPage('P','','','','',5,5,19,20,3,3,'','','','','','','','','','A4-P');
+            $mpdf->WriteHTML($pdfData);
+            
+            ob_clean();
+            $mpdf->Output($pdfFileName, 'I');
+        
+        else:
+            $this->printJson(['status'=>1, 'tbody'=>$tbody]);
+        endif;
+    }
+
+    public function ledgerDetail($acc_id,$start_date="",$end_date=""){
+        $ledgerData = $this->party->getParty(['id'=>$acc_id]);
+        $this->data['acc_id'] = $acc_id;
+        $this->data['acc_name'] = $ledgerData->party_name;
+        $this->data['ledgerData'] = $ledgerData;
+        $this->data['startDate'] = $this->startYearDate;
+        $this->data['endDate'] = $this->endYearDate;
+        $this->load->view($this->estimate_ledger_details,$this->data);
+    }
+
+    public function getLedgerTransaction($jsonData=""){
+        if(!empty($jsonData)):
+            $postData = (Array) decodeURL($jsonData);
+        else:
+            $postData = $this->input->post();
+        endif;
+        
+        $ledgerTransactions = $this->estimate->getLedgerDetails($postData);
+        $ledgerBalance = $this->estimate->getLedgerSummary($postData);
+
+        $i=1; $tbody="";$balance = $ledgerBalance->op_balance;$totalCrAmount = $totalDrAmount = 0;
+        foreach($ledgerTransactions as $row):
+            $balance += round(($row->amount * $row->p_or_m),2); 
+            $balanceText = ($balance > 0)?abs($balance)." CR":(($balance < 0)?abs($balance)." DR":0);
+
+            $tbody .= '<tr>
+                <td>'.$i++.'</td>
+                <td>'.formatDate($row->trans_date).'</td>
+                <td>'.$row->trans_number.'</td>
+                <td class="text-right">'.$row->cr_amount.'</td>
+                <td class="text-right">'.$row->dr_amount.'</td>
+                <td style="text-align: center;">'.$balanceText.'</td>
+            </tr>';
+
+            $totalCrAmount += $row->cr_amount; 
+            $totalDrAmount += $row->dr_amount;
+        endforeach;    
+        
+        
+        if($ledgerBalance->op_balance > 0): $ledgerBalance->op_balance_type = "Cr.";
+        elseif($ledgerBalance->op_balance < 0): $ledgerBalance->op_balance_type = "Dr.";
+        else: $ledgerBalance->op_balance_type = ""; endif;
+
+        if($ledgerBalance->cl_balance > 0): $ledgerBalance->cl_balance_type = "Cr.";
+        elseif($ledgerBalance->cl_balance < 0): $ledgerBalance->cl_balance_type = "Dr.";
+        else: $ledgerBalance->cl_balance_type = ""; endif;
+
+        $ledgerBalance->cl_balance = abs($ledgerBalance->cl_balance);
+        $ledgerBalance->op_balance = abs($ledgerBalance->op_balance);
+        $ledgerBalance->cr_balance = abs($totalCrAmount);
+        $ledgerBalance->dr_balance = abs($totalDrAmount);
+
+        
+        if(!empty($postData['pdf'])):
+            $acc_name=$this->party->getParty(['id'=>$postData['acc_id']])->party_name;
+            $reportTitle = $acc_name;
+            $report_date = date('d-m-Y',strtotime($postData['from_date'])).' to '.date('d-m-Y',strtotime($postData['to_date']));   
+            $thead = (empty($jsonData)) ? '<tr class="text-center"><th colspan="11">'.$reportTitle.' ('.$report_date.')</th></tr>' : '';
+
+            $companyData = $this->masterModel->getCompanyInfo();
+			$logoFile = (!empty($companyData->company_logo)) ? $companyData->company_logo : 'logo.png';
+			$logo = base_url('assets/images/' . $logoFile);
+			$letter_head = base_url('assets/images/letterhead_top.png');
+
+            $thead .= '<tr>
+                <th>#</th>
+                <th>Vou. Date</th>
+                <th>Vou. No.</th>
+                <th>Amount(CR.)</th>
+                <th>Amount(DR.)</th>
+                <th>Balance</th>
+            </tr>';
+
+            $pdfData = '<table id="commanTable" class="table table-bordered item-list-bb" repeat_header="1">
+                <thead class="thead-info" id="theadData">'.$thead.'</thead>
+                <tbody id="receivableData">'.$tbody.'</tbody>
+                <tfoot class="thead-info">
+                    <tr>
+                        <th colspan="5" class="text-right">Total</th>
+                        <th id="cr_balance">'.$ledgerBalance->cr_balance.'</th>
+                        <th id="dr_balance">'.$ledgerBalance->dr_balance.'</th>
+                        <th></th>
+                    </tr>
+                </tfoot>    
+            </table>
+            <table class="table" style="border-top:1px solid #036aae;border-bottom:1px solid #036aae;margin-bottom:10px;margin-top:10px;">
+                <tr>
+                    <td class="org_title text-uppercase text-left" style="font-size:1rem;width:50%">'.$ledgerBalance->bcl_balance_text.'</td>
+                    <td class="org_title text-uppercase text-right" style="font-size:1rem;width:50%"> Closing Balance: '.$ledgerBalance->cl_balance.' '.$ledgerBalance->cl_balance_type.'</td>
+                </tr>
+            </table>';
+
+            $htmlHeader = '<table class="table" style="border-bottom:1px solid #036aae;">
+                <tr>
+                    <td class="org_title text-uppercase text-left" style="font-size:1rem;width:30%"></td>
+                    <td class="org_title text-uppercase text-center" style="font-size:1.3rem;width:40%">'.$companyData->company_name.'</td>
+                    <td class="org_title text-uppercase text-right" style="font-size:1rem;width:30%"></td>
+                </tr>
+            </table>
+            <table class="table" style="border-bottom:1px solid #036aae;margin-bottom:2px;">
+                <tr><td class="org-address text-center" style="font-size:13px;">'.$companyData->company_address.'</td></tr>
+            </table>
+            <table class="table" style="border-bottom:1px solid #036aae;margin-bottom:10px;">
+                <tr>
+                    <td class="org_title text-uppercase text-left" style="font-size:1rem;width:30%">Date : '.$report_date.'</td>
+                    <td class="org_title text-uppercase text-center" style="font-size:1.3rem;width:40%">'.$reportTitle.'</td>
+                    <td class="org_title text-uppercase text-right" style="font-size:1rem;width:30%"> Opening Balance: '.$ledgerBalance->op_balance.' '.$ledgerBalance->op_balance_type.'</td>
+                </tr>
+            </table>';  
+			$htmlFooter = '<table class="table top-table" style="margin-top:10px;border-top:1px solid #545454;">
+                <tr>
+                    <td style="width:50%;font-size:12px;">Printed On ' . date('d-m-Y') . '</td>
+                    <td style="width:50%;text-align:right;font-size:12px;">Page No. {PAGENO}/{nbpg}</td>
+                </tr>
+            </table>';
+                        
+            $mpdf = new \Mpdf\Mpdf();
+            $filePath = realpath(APPPATH . '../assets/uploads/');
+            $pdfFileName = $filePath.'/AccountLedgerDetail.pdf';
+            $stylesheet = file_get_contents(base_url('assets/css/pdf_style.css?v='.time()));
+            $mpdf->WriteHTML($stylesheet, 1);
+            $mpdf->SetDisplayMode('fullpage');
+            $mpdf->SetWatermarkImage($logo, 0.08, array(120, 120));
+            $mpdf->showWatermarkImage = true;
+            $mpdf->SetTitle($reportTitle);
+            $mpdf->SetHTMLHeader($htmlHeader);
+            $mpdf->SetHTMLFooter($htmlFooter);
+            $mpdf->AddPage('L','','','','',5,5,30,5,3,3,'','','','','','','','','','A4-L');
+            $mpdf->WriteHTML($pdfData);
+            
+            ob_clean();
+            $mpdf->Output($pdfFileName, 'I');
+        
+        else:
+            $this->printJson(['status'=>1, 'tbody'=>$tbody,'ledgerBalance'=>$ledgerBalance]);
         endif;
     }
 }

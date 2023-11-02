@@ -171,8 +171,8 @@ class EstimateModel extends MasterModel{
     public function getEstimate($data){
         $queryData = array();
         $queryData['tableName'] = $this->transMain;
-        $queryData['select'] = "trans_main.*,trans_details.i_col_1 as bill_per,trans_details.t_col_1 as contact_person,trans_details.t_col_2 as contact_no,trans_details.t_col_3 as ship_address";
-        $queryData['leftJoin']['trans_details'] = "trans_main.id = trans_details.main_ref_id AND trans_details.description = 'SI MASTER DETAILS' AND trans_details.table_name = '".$this->transMain."'";
+        $queryData['select'] = "trans_main.*,trans_detailss.i_col_1 as bill_per,trans_detailss.t_col_1 as contact_person,trans_detailss.t_col_2 as contact_no,trans_detailss.t_col_3 as ship_address";
+        $queryData['leftJoin']['trans_detailss'] = "trans_main.id = trans_detailss.main_ref_id AND trans_detailss.description = 'SI MASTER DETAILS' AND trans_detailss.table_name = '".$this->transMain."'";
         $queryData['where']['trans_main.id'] = $data['id'];
         $result = $this->row($queryData);
 
@@ -311,6 +311,74 @@ class EstimateModel extends MasterModel{
             $this->db->trans_rollback();
             return ['status'=>2,'message'=>"somthing is wrong. Error : ".$e->getMessage()];
         }
+    }
+
+    public function getLedgerSummary($data){
+        $party_id = ((!empty($data['acc_id']))?" AND trans_main.party_id = ".$data['acc_id']:"");
+
+        $query = $this->db->query("SELECT trans_main.party_id,trans_main.party_name, (IFNULL(es.op_amount,0) + IFNULL(pm.op_amount,0)) as op_balance,(IFNULL(es.cl_amount,0) + IFNULL(pm.cl_amount,0)) as cl_balance
+        FROM trans_main         
+        LEFT JOIN (
+            SELECT trans_main.party_id,SUM((CASE WHEN trans_main.trans_date < '".$data['from_date']."' THEN (trans_main.net_amount * -1) ELSE 0 END)) as op_amount,SUM((CASE WHEN trans_main.trans_date >= '".$data['from_date']."' AND trans_main.trans_date <= '".$data['to_date']."' THEN (trans_main.net_amount * -1) ELSE 0 END)) as cl_amount
+            FROM trans_main
+            WHERE trans_main.entry_type = 40
+            AND trans_main.is_delete = 0
+            ".$party_id."
+            GROUP BY trans_main.party_id
+        ) as es ON es.party_id = trans_main.party_id        
+        LEFT JOIN (
+            SELECT trans_main.party_id,SUM((CASE WHEN trans_details.date_col_1 < '".$data['from_date']."' THEN trans_details.d_col_1 ELSE 0 END)) as op_amount,SUM((CASE WHEN trans_details.date_col_1 >= '".$data['from_date']."' AND trans_details.date_col_1 <= '".$data['to_date']."' THEN trans_details.d_col_1 ELSE 0 END)) as cl_amount        
+            FROM trans_main         
+            LEFT JOIN trans_details ON trans_main.id = trans_details.main_ref_id AND trans_details.description = 'EST PAYMENT' AND trans_details.table_name = 'trans_main' AND trans_details.is_delete = 0        
+            WHERE trans_main.entry_type = 40
+            ".$party_id."
+            AND trans_main.is_delete = 0
+            GROUP BY trans_main.party_id
+        ) as pm ON pm.party_id = trans_main.party_id        
+        WHERE trans_main.entry_type = 40
+        ".$party_id."
+        AND trans_main.is_delete = 0
+        GROUP BY trans_main.party_id");
+
+        if(!empty($data['acc_id'])):
+            $result = $query->row();
+        else:
+            $result = $query->result();
+        endif;
+        return $result;
+    }
+
+    public function getLedgerDetails($data){
+        $queryData = array();
+        $queryData['tableName'] = $this->transMain;
+        $queryData['select'] = "id,vou_name_s,trans_date,trans_number,net_amount as dr_amount, 0 as cr_amount, '-1' as p_or_m,net_amount as amount";
+        $queryData['where']['entry_type'] = $this->data['entryData']->id;
+        $queryData['where']['party_id'] = $data['acc_id'];
+        $queryData['where']['trans_date >='] = $data['from_date'];
+        $queryData['where']['trans_date <='] = $data['to_date'];
+        $estimate = $this->rows($queryData);
+
+        $queryData = array();
+        $queryData['tableName'] = $this->transMain;
+        $queryData['select'] = "trans_details.id,'CashRct' as vou_name_s,trans_details.date_col_1 as trans_date,'' as trans_number,0 as dr_amount,trans_details.d_col_1 as cr_amount,'1' as p_or_m,trans_details.d_col_1 as amount";
+        $queryData['leftJoin']['trans_details'] = "trans_main.id = trans_details.main_ref_id AND trans_details.table_name = '".$this->transMain."' AND trans_details.description = 'EST PAYMENT' AND trans_details.is_delete = 0";
+        $queryData['where']['trans_main.entry_type'] = $this->data['entryData']->id;
+        $queryData['where']['trans_main.party_id'] = $data['acc_id'];
+        $queryData['where']['trans_details.date_col_1 >='] = $data['from_date'];
+        $queryData['where']['trans_details.date_col_1 <='] = $data['to_date'];
+        $queryData['where']['trans_details.d_col_1 > '] = 0;
+        $estimatePayment = $this->rows($queryData);
+
+        /* $ledgerDetails = array();
+        if(!empty($estimatePayment)):
+            $ledgerDetails = array_merge($estimate,$estimatePayment);
+        else:
+            $ledgerDetails = $estimate;
+        endif;
+        print_r($ledgerDetails);exit; */
+        $ledgerDetails = array_merge($estimate,$estimatePayment);
+        array_multisort(array_column($ledgerDetails, 'trans_date'), SORT_ASC, $ledgerDetails);
+        return $ledgerDetails;
     }
 }
 ?>

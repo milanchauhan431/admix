@@ -363,7 +363,7 @@ function generateEwb(postData){
 							$(".error").html("");
 							$.each( data.message, function( key, value ) {$("."+key).html(value);});
 						}else if(data.status==1){
-							initTable(); $('#'+formId)[0].reset();colseModal(formId);
+							initTable(); $('#'+formId)[0].reset();closeModal(formId);
 							toastr.success(data.message, 'Success', { "showMethod": "slideDown", "hideMethod": "slideUp", "closeButton": true, positionClass: 'toastr toast-bottom-center', containerId: 'toast-bottom-center', "progressBar": true });
 						}else{
 							initTable(); 
@@ -413,7 +413,7 @@ function syncEwayBill(postData){
 							$(".error").html("");
 							$.each( data.message, function( key, value ) {$("."+key).html(value);});
 						}else if(data.status==1){
-							initTable(); $('#'+formId)[0].reset();colseModal(formId);
+							initTable(); $('#'+formId)[0].reset();closeModal(formId);
 							toastr.success(data.message, 'Success', { "showMethod": "slideDown", "hideMethod": "slideUp", "closeButton": true, positionClass: 'toastr toast-bottom-center', containerId: 'toast-bottom-center', "progressBar": true });
 						}else{
 							initTable(); 
@@ -462,7 +462,7 @@ function cancelEwayBill(postData){
 							$(".error").html("");
 							$.each( data.message, function( key, value ) {$("."+key).html(value);});
 						}else if(data.status==1){
-							initTable(); $('#'+formId)[0].reset();colseModal(formId);
+							initTable(); $('#'+formId)[0].reset();closeModal(formId);
 							toastr.success(data.message, 'Success', { "showMethod": "slideDown", "hideMethod": "slideUp", "closeButton": true, positionClass: 'toastr toast-bottom-center', containerId: 'toast-bottom-center', "progressBar": true });
 						}else{
 							initTable();
@@ -513,7 +513,7 @@ function generateEinvoice(postData){
 							$(".error").html("");
 							$.each( data.message, function( key, value ) {$("."+key).html(value);});
 						}else if(data.status==1){
-							initTable(); $('#'+formId)[0].reset();colseModal(formId);
+							initTable(); $('#'+formId)[0].reset();closeModal(formId);
 							toastr.success(data.message, 'Success', { "showMethod": "slideDown", "hideMethod": "slideUp", "closeButton": true, positionClass: 'toastr toast-bottom-center', containerId: 'toast-bottom-center', "progressBar": true });
 						}else{
 							initTable();
@@ -562,7 +562,7 @@ function syncEinv(postData){
 							$(".error").html("");
 							$.each( data.message, function( key, value ) {$("."+key).html(value);});
 						}else if(data.status==1){
-							initTable(); $('#'+formId)[0].reset();colseModal(formId);
+							initTable(); $('#'+formId)[0].reset();closeModal(formId);
 							toastr.success(data.message, 'Success', { "showMethod": "slideDown", "hideMethod": "slideUp", "closeButton": true, positionClass: 'toastr toast-bottom-center', containerId: 'toast-bottom-center', "progressBar": true });
 						}else{
 							initTable();
@@ -613,7 +613,7 @@ function cancelEinv(postData){
 							$(".error").html("");
 							$.each( data.message, function( key, value ) {$("."+key).html(value);});
 						}else if(data.status==1){
-							initTable(); $('#'+formId)[0].reset();colseModal(formId);
+							initTable(); $('#'+formId)[0].reset();closeModal(formId);
 							toastr.success(data.message, 'Success', { "showMethod": "slideDown", "hideMethod": "slideUp", "closeButton": true, positionClass: 'toastr toast-bottom-center', containerId: 'toast-bottom-center', "progressBar": true });
 						}else{
 							initTable();
