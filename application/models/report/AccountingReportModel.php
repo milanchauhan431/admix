@@ -14,7 +14,7 @@ class AccountingReportModel extends MasterModel{
             SUM( CASE WHEN tl.trans_date >= '".$startDate."' AND tl.trans_date <= '".$endDate."' THEN CASE WHEN tl.c_or_d = 'CR' THEN tl.amount ELSE 0 END ELSE 0 END) as cr_balance,
             ((am.opening_balance) + SUM( CASE WHEN tl.trans_date <= '".$endDate."' THEN (tl.amount * tl.p_or_m) ELSE 0 END )) as cl_balance 
             FROM party_master as am 
-            LEFT JOIN trans_ledger as tl ON am.id = tl.vou_acc_id 
+            LEFT JOIN trans_ledger as tl ON am.id = tl.vou_acc_id AND tl.is_delete = 0
             WHERE am.is_delete = 0 GROUP BY am.id, am.opening_balance) as lb 
         LEFT JOIN party_master as am ON lb.id = am.id WHERE am.is_delete = 0 
         ORDER BY am.party_name ")->result();
@@ -197,6 +197,34 @@ class AccountingReportModel extends MasterModel{
         return $bankCashBook;
     }
 
+    public function getMonthlySummary($data){
+        $from_date = date("Y-m-d",strtotime($data['from_date']));
+        $to_date = date("Y-m-d",strtotime($data['to_date']));
+        $vouName = $data['vou_name_s'];
+
+        $this->db->query("set @start_date = '".$from_date."';");
+        $this->db->query("set @end_date = '".$to_date."';");
+        $this->db->query("set @months = -1;");
+
+        $result = $this->db->query("SELECT DATE_FORMAT(monthList.date_range,'%M, %Y') AS month_name, tm.total_taxable_amount, tm.total_cgst_amount, tm.total_sgst_amount, tm.total_igst_amount, tm.total_net_amount
+        FROM (
+            SELECT (date_add(@start_date, INTERVAL (@months := @months +1 ) month)) as date_range
+            FROM mysql.help_topic monthList
+        ) monthList
+        LEFT JOIN (
+            SELECT DATE_FORMAT(trans_date,'%Y-%m') as month_name, SUM(taxable_amount) as total_taxable_amount, SUM(cgst_amount) as total_cgst_amount, SUM(sgst_amount) as total_sgst_amount, SUM(igst_amount) as total_igst_amount, SUM(net_amount) as total_net_amount
+            FROM trans_main 
+            WHERE is_delete = 0
+            AND vou_name_s = '".$vouName."'
+            AND trans_date >= '".$from_date."'
+            AND trans_date <= '".$to_date."'
+            GROUP BY  DATE_FORMAT(trans_date,'%Y-%m')
+        ) AS tm ON tm.month_name = DATE_FORMAT(monthList.date_range,'%Y-%m')
+        WHERE monthList.date_range BETWEEN @start_date AND last_day(@end_date)")->result();
+
+        return $result;
+    }
+
     public function _productOpeningAndClosingAmount($data){
         $from_date = date("Y-m-d",strtotime($data['from_date']));
         $to_date = date("Y-m-d",strtotime($data['to_date']));
@@ -365,7 +393,7 @@ class AccountingReportModel extends MasterModel{
             SUM(am.opening_balance) + SUM( CASE WHEN gm.nature = 'Expenses' AND tl.trans_date <= '$to_date' THEN (tl.amount * tl.p_or_m) ELSE 0 END) as expense 
             FROM ( ( party_master as am LEFT JOIN trans_ledger as tl ON am.id = tl.vou_acc_id AND tl.is_delete = 0) 
             LEFT JOIN group_master gm ON am.group_id = gm.id ) 
-            WHERE am.is_delete = 0 AND tl.is_delete = 0 $extraWhere 
+            WHERE am.is_delete = 0 $extraWhere 
         ) as pnl")->row();
 
         return $result;

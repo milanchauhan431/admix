@@ -965,6 +965,63 @@ class AccountingReport extends MY_Controller{
         endif;
     }
 
+    public function salesSummary(){
+        $this->data['headData']->pageUrl = "reports/accountingReport/salesSummary";
+        $this->data['headData']->pageTitle = "SALES SUMMARY";
+        $this->data['pageHeader'] = 'SALES SUMMARY';
+        $this->data['startDate'] = $this->startYearDate;
+        $this->data['endDate'] = $this->endYearDate;
+        $this->load->view("reports/accounting_report/sales_summary",$this->data);
+    }
+
+    public function getSalesSummary(){
+        $data = $this->input->post();
+        $data['from_date'] = $this->startYearDate;
+        $data['to_date'] = $this->endYearDate;
+        $data['vou_name_s'] = 'Sale';
+        $result = $this->accountReport->getMonthlySummary($data);
+
+        $thead = '<tr>
+            <th>Month</th>
+            <th>Taxable Amount</th>
+            <th>IGST Amount</th>
+            <th>CGST Amount</th>
+            <th>SGST Amount</th>
+            <th>Net Amount</th>
+        </tr>';
+
+        $tbody = ''; $i =1;
+        
+        $totalTaxableAmount = $totalCgstAmount = $totalSgstAmount = $totalIgstAmount = $totalNetAmount = 0;
+        foreach($result as $row):
+            $tbody .= '<tr>
+                <td>'.$row->month_name.'</td>
+                <td>'.floatVal($row->total_taxable_amount).'</td>
+                <td>'.floatVal($row->total_igst_amount).'</td>
+                <td>'.floatVal($row->total_cgst_amount).'</td>
+                <td>'.floatVal($row->total_sgst_amount).'</td>
+                <td>'.floatVal($row->total_net_amount).'</td>
+            </tr>';
+
+            $totalTaxableAmount += $row->total_taxable_amount;
+            $totalCgstAmount += $row->total_cgst_amount;
+            $totalSgstAmount += $row->total_sgst_amount;
+            $totalIgstAmount += $row->total_igst_amount;
+            $totalNetAmount += $row->total_net_amount;
+        endforeach;
+
+        $tfoot = '<tr>
+            <th>Total</th>
+            <th>'.floatVal($totalTaxableAmount).'</th>
+            <th>'.floatVal($totalIgstAmount).'</th>
+            <th>'.floatVal($totalCgstAmount).'</th>
+            <th>'.floatVal($totalSgstAmount).'</th>
+            <th>'.floatVal($totalNetAmount).'</th>
+        </tr>';
+
+        $this->printJson(['status'=>1,'thead'=>$thead,'tbody'=>$tbody,'tfoot'=>$tfoot]);
+    }
+
     public function trailBalance(){
         $this->data['headData']->pageUrl = "reports/accountingReport/trailBalance";
         $this->data['headData']->pageTitle = "Trail Balance";
