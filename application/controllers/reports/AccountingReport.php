@@ -3,17 +3,16 @@ class AccountingReport extends MY_Controller{
 
     public function __construct(){
         parent::__construct();
-        $this->isLoggedin();
         $this->data['headData']->pageTitle = "Accounting Report";
         $this->data['headData']->controller = "reports/accountingReport";
     }
 
-    public function salesRegister(){
+    public function salesRegister($startDate="",$endDate=""){
         $this->data['headData']->pageUrl = "reports/accountingReport/salesRegister";
         $this->data['headData']->pageTitle = "SALES REGISTER";
         $this->data['pageHeader'] = 'SALES REGISTER';
-        $this->data['startDate'] = getFyDate(date("Y-m-01"));
-        $this->data['endDate'] = getFyDate(date("Y-m-d"));
+        $this->data['startDate'] = (!empty($startDate))?$startDate:getFyDate(date("Y-m-01"));
+        $this->data['endDate'] = (!empty($endDate))?$endDate:getFyDate(date("Y-m-d"));
         $this->load->view("reports/accounting_report/sales_register",$this->data);
     }
 
@@ -994,13 +993,14 @@ class AccountingReport extends MY_Controller{
         
         $totalTaxableAmount = $totalCgstAmount = $totalSgstAmount = $totalIgstAmount = $totalNetAmount = 0;
         foreach($result as $row):
+            $month = '<a href="'.base_url("reports/accountingReport/salesRegister/".date("Y-m-01",strtotime($row->month_name))."/".date("Y-m-t",strtotime($row->month_name))).'" target="_blank">'.$row->month_name.'</a>';
             $tbody .= '<tr>
-                <td>'.$row->month_name.'</td>
-                <td>'.floatVal($row->total_taxable_amount).'</td>
-                <td>'.floatVal($row->total_igst_amount).'</td>
-                <td>'.floatVal($row->total_cgst_amount).'</td>
-                <td>'.floatVal($row->total_sgst_amount).'</td>
-                <td>'.floatVal($row->total_net_amount).'</td>
+                <td class="text-left">'.$month.'</td>
+                <td class="text-right">'.floatVal($row->total_taxable_amount).'</td>
+                <td class="text-right">'.floatVal($row->total_igst_amount).'</td>
+                <td class="text-right">'.floatVal($row->total_cgst_amount).'</td>
+                <td class="text-right">'.floatVal($row->total_sgst_amount).'</td>
+                <td class="text-right">'.floatVal($row->total_net_amount).'</td>
             </tr>';
 
             $totalTaxableAmount += $row->total_taxable_amount;
@@ -1011,12 +1011,12 @@ class AccountingReport extends MY_Controller{
         endforeach;
 
         $tfoot = '<tr>
-            <th>Total</th>
-            <th>'.floatVal($totalTaxableAmount).'</th>
-            <th>'.floatVal($totalIgstAmount).'</th>
-            <th>'.floatVal($totalCgstAmount).'</th>
-            <th>'.floatVal($totalSgstAmount).'</th>
-            <th>'.floatVal($totalNetAmount).'</th>
+            <th class="text-left">Total</th>
+            <th class="text-right">'.floatVal($totalTaxableAmount).'</th>
+            <th class="text-right">'.floatVal($totalIgstAmount).'</th>
+            <th class="text-right">'.floatVal($totalCgstAmount).'</th>
+            <th class="text-right">'.floatVal($totalSgstAmount).'</th>
+            <th class="text-right">'.floatVal($totalNetAmount).'</th>
         </tr>';
 
         $this->printJson(['status'=>1,'thead'=>$thead,'tbody'=>$tbody,'tfoot'=>$tfoot]);
