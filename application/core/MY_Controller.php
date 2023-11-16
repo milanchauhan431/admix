@@ -101,8 +101,13 @@ class MY_Controller extends CI_Controller{
 		/* Store Report Model */
 		$this->load->model('report/StoreReportModel','storeReport');
 
+		/* Sales Report Model */
+		$this->load->model('report/SalesReportModel','salesReport');
+
 		/* Accounting Report Model */
 		$this->load->model('report/AccountingReportModel','accountReport');
+
+		/* GST Report Model */
 		$this->load->model('report/GstReportModel','gstReport');
 
 		/* Estimation Model [Cash Entry] */
