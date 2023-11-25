@@ -39,6 +39,7 @@ $(document).ready(function(){
     /* $(document).on('change','#sales_type', function(){ gstin(); }); */
 	$(document).on('change',"#apply_round",function(){ claculateColumn(); });
 
+	setTimeout(function(){ $("#itemForm #brand_id").trigger('change'); },500);
 	$(document).on('change','#itemForm #brand_id',function(){
 		if($(this).find(":selected").val() != ""){
             $("#itemForm #brand_name").val($(this).find(":selected").text());

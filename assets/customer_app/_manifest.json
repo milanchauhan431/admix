@@ -1,0 +1,65 @@
+{
+"version": "3.0",
+"lang" : "en",
+"name" : "ADMIXCA",
+"id":"admix_ca",
+"short_name" : "ADMIXCA",
+"start_url": "https://admix.scubeerp.in/customerApp/",
+"display" : "standalone",
+"scope" : "https://admix.scubeerp.in/customerApp/",
+"description" : "ADMIX CUSTOMER APP",
+"background_color": "#FFFFFF",
+"theme_color": "#000000",
+"orientation" : "portrait",
+"generated" : "true",
+  "icons": [
+    {
+        "src": "https://admix.scubeerp.in/assets/customer_app/images/icon/72.png",
+        "type": "image/png",
+        "sizes": "72x72",
+        "purpose": "any maskable"
+    },
+    {
+        "src": "https://admix.scubeerp.in/assets/customer_app/images/icon/96.png",
+        "type": "image/png",
+        "sizes": "96x96",
+        "purpose": "any maskable"
+    },
+    {
+        "src": "https://admix.scubeerp.in/assets/customer_app/images/icon/128.png",
+        "type": "image/png",
+        "sizes": "128x128",
+        "purpose": "any maskable"
+    },
+    {
+        "src": "https://admix.scubeerp.in/assets/customer_app/images/icon/144.png",
+        "type": "image/png",
+        "sizes": "144x144",
+        "purpose": "any maskable"
+    },
+    {
+        "src": "https://admix.scubeerp.in/assets/customer_app/images/icon/152.png",
+        "type": "image/png",
+        "sizes": "152x152",
+        "purpose": "any maskable"
+    },
+    {
+        "src": "https://admix.scubeerp.in/assets/customer_app/images/icon/192.png",
+        "type": "image/png",
+        "sizes": "192x192",
+        "purpose": "any maskable"
+    },
+    {
+        "src": "https://admix.scubeerp.in/assets/customer_app/images/icon/256.png",
+        "type": "image/png",
+        "sizes": "256x256",
+        "purpose": "any maskable"
+    },
+    {
+        "src": "https://admix.scubeerp.in/assets/customer_app/images/icon/512.png",
+        "type": "image/png",
+        "sizes": "512x512",
+        "purpose": "any maskable"
+    }
+  ]
+}

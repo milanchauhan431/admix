@@ -110,6 +110,10 @@ function getPartyData($data){
     $deleteButton = '<a class="btn btn-danger btn-delete permission-remove" href="javascript:void(0)" onclick="trash('.$deleteParam.');" datatip="Remove" flow="down"><i class="ti-trash"></i></a>';
 
     $gstJsonBtn="";$contactBtn="";
+    $empInfo = "";
+    if($data->user_status != 1 && !empty($data->party_mobile) ):
+        $empInfo = '<a class="btn btn-success btn-complete createUser permission-modify" href="javascript:void(0)" datatip="CreateUser" flow="down" data-val="1" data-id="'.$data->id.'" data-emp_id="'.$data->emp_id.'"><i class="fa fa-user" aria-hidden="true"></i></a>';
+    endif;
     /* if($data->party_category == 1):
         //$gstParam = "{'postData':{'id' : ".$data->id."}, 'modal_id' : 'modal-lg','button' : 'close', 'form_id' : 'gstDetail', 'title' : 'GST Detail', 'fnedit' : 'gstDetail', 'fnsave' : 'saveGstDetail','js_store_fn' : 'customStore'}";
         //$gstJsonBtn = '<a class="btn btn-warning btn-contact permission-modify" href="javascript:void(0)" datatip="GST Detail" flow="down" onclick="edit('.$gstParam.');"><i class="fab fa-google"></i></a>';
@@ -118,7 +122,7 @@ function getPartyData($data){
         //$contactBtn = '<a class="btn btn-info btn-contact permission-modify" href="javascript:void(0)" datatip="Contact Detail" flow="down" onclick="edit('.$contactParam.');"><i class="fa fa-address-book"></i></a>';
     endif; */
 
-    $action = getActionButton($contactBtn.$gstJsonBtn.$editButton.$deleteButton);
+    $action = getActionButton($empInfo.$contactBtn.$gstJsonBtn.$editButton.$deleteButton);
 
     if($data->table_status == 1):
         $responseData = [$action,$data->sr_no,$data->party_name,$data->contact_person,$data->party_mobile,$data->party_code,$data->currency];

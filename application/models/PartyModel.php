@@ -395,5 +395,38 @@ class PartyModel extends MasterModel{
 		foreach($result as $row){$searchResult[] = $row->party_name;}
 		return  $searchResult;
     }
+
+    
+    // CREATED BY MEGHAVI @05/11/2023
+    public function createUser($data){ 
+        $msg ="";
+        $partyData = $this->getPartyDetail($data['id']);
+        
+        $empInfo = [
+            'id' => "",
+            'emp_name' => $partyData->party_name,
+            'emp_code' => $partyData->party_mobile,
+            'emp_contact' => $partyData->party_mobile, 
+            'emp_password' =>  md5('123456'),           
+            'emp_psc' => '123456',
+            'emp_role' => 7,
+            'party_id' => $data['id']
+        ];
+        $this->store('employee_master',$empInfo);
+        $partyData = [
+            'user_status' => 1
+        ];
+        $this->edit('party_master', ['id' => $data['id']], $partyData);
+        return ['status'=>1,'message'=>"Create User ".$msg." successfully."];
+    }
+
+    // CREATED BY MEGHAVI @05/11/2023
+    public function getPartyDetail($id)
+    {
+        $data['tableName'] = 'party_master';
+        $data['select'] = "party_master.*";
+        $data['where']['id'] = $id;
+        return $this->row($data);
+    }
 }
 ?>

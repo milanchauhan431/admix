@@ -320,5 +320,15 @@ class Parties extends MY_Controller{
         $gstDetails = $this->party->getPartyGSTDetail(['party_id'=>$data['id']]);
         $this->printJson(['status'=>1,'data'=>['partyDetail'=>$partyDetail,'gstDetails'=>$gstDetails]]);
     }
+
+    /** CREATED AT 05/11/2023 BY MEGHAVI */ 
+    public function createUser(){
+        $data = $this->input->post(); 
+        if(empty($data['id'])):
+            $this->printJson(['status'=>0,'message'=>'Somthing went wrong...Please try again.']);
+        else:
+            $this->printJson($this->party->createUser($data));
+        endif;
+    }
 }
 ?>

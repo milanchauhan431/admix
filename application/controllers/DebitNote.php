@@ -58,16 +58,16 @@ class DebitNote extends MY_Controller{
             $errorMessage['itemData'] = "Item Details is required.";
         else:
             foreach($data['itemData'] as $key => $row):
-                if(!empty(floatVal($row['qty'])) && !empty($row['size']) && $row['item_type'] == 1):
+                /* if(!empty(floatVal($row['qty'])) && !empty($row['size']) && $row['item_type'] == 1):
                     if(is_int(($row['qty'] / $row['packing_qty'])) == false):
                         $errorMessage['qty'.$key] = "Invalid qty against packing standard.";
                     endif;
-                endif;
+                endif; */
 
                 if($row['stock_eff'] == 1):
                     $postData = ['location_id' => $this->RTD_STORE->id,'batch_no' => "GB",'item_id' => $row['item_id'],'stock_required'=>1,'single_row'=>1];
                     
-                    $stockData = $this->itemStock->getItemStockBatchWise($postData);  
+                    $stockData = $this->itemStock->getItemStockBatchWise($postData);
                     
                     $stockQty = (!empty($stockData->qty))?$stockData->qty:0;
                     if(!empty($row['id'])):

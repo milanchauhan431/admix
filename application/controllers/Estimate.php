@@ -69,7 +69,9 @@ class Estimate extends MY_Controller{
                 if($row['stock_eff'] == 1):
                     $postData = ['location_id' => $this->RTD_STORE->id,'batch_no' => $row['brand_name'],'item_id' => $row['item_id'],'stock_required'=>1,'single_row'=>1];
                     
-                    $stockData = $this->itemStock->getItemStockBatchWise($postData);  
+                    $stockData = $this->itemStock->getItemStockBatchWise($postData); 
+                    $batchKey = "";
+                    $batchKey = $row['brand_id'].$row['item_id']; 
                     
                     $stockQty = (!empty($stockData->qty))?$stockData->qty:0;
                     if(!empty($row['id'])):
@@ -77,16 +79,16 @@ class Estimate extends MY_Controller{
                         $stockQty = $stockQty + $oldItem->qty;
                     endif;
                     
-                    if(!isset($bQty[$row['item_id']])):
-                        $bQty[$row['item_id']] = $row['qty'] ;
+                    if(!isset($bQty[$batchKey])):
+                        $bQty[$batchKey] = $row['qty'] ;
                     else:
-                        $bQty[$row['item_id']] += $row['qty'];
+                        $bQty[$batchKey] += $row['qty'];
                     endif;
 
                     if(empty($stockQty)):
                         $errorMessage['qty'.$key] = "Stock not available.";
                     else:
-                        if($bQty[$row['item_id']] > $stockQty):
+                        if($bQty[$batchKey] > $stockQty):
                             $errorMessage['qty'.$key] = "Stock not available.";
                         endif;
                     endif;

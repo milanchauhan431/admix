@@ -64,6 +64,10 @@ class ItemModel extends MasterModel{
             $queryData['where_in']['item_master.item_type'] = $data['item_type'];
         endif;
 
+        if(!empty($data['ids'])):
+            $queryData['where_in']['item_master.id'] = $data['ids'];
+        endif;
+        
         if(!empty($data['active_item'])):
             $queryData['where_in']['item_master.active'] = $data['active_item'];
         else:

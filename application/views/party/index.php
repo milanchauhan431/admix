@@ -27,6 +27,56 @@
 
 <?php $this->load->view('includes/footer'); ?>
 <script>
+$(document).ready(function () {
+    $(document).on('click','.createUser',function(){
+            var id = $(this).data('id');
+            var emp_id = $(this).data('emp_id');
+            var status = $(this).data('val');
+            var msg = "";
+            if(status == 1){
+                msg = "Complete";
+            }
+
+            $.confirm({
+                title: 'Confirm!',
+                content: 'Are you sure want to '+msg+' Create User?',
+                type: 'green',
+                buttons: {   
+                    ok: {
+                        text: "ok!",
+                        btnClass: 'btn waves-effect waves-light btn-outline-success',
+                        keys: ['enter'],
+                        action: function(){
+                            $.ajax({
+                                url: base_url + controller + '/createUser',
+                                data: {id:id,emp_id:emp_id,user_status:status},
+                                type: "POST",
+                                dataType:"json",
+                                success:function(data)
+                                {
+                                    if(data.status==0)
+                                    {
+                                        toastr.error(data.message, 'Sorry...!', { "showMethod": "slideDown", "hideMethod": "slideUp", "closeButton": true, positionClass: 'toastr toast-bottom-center', containerId: 'toast-bottom-center', "progressBar": true });
+                                    }
+                                    else
+                                    {
+                                        initTable(); 
+                                        toastr.success(data.message, 'Success', { "showMethod": "slideDown", "hideMethod": "slideUp", "closeButton": true, positionClass: 'toastr toast-bottom-center', containerId: 'toast-bottom-center', "progressBar": true });
+                                    }
+                                }
+                            });
+                        }
+                    },
+                    cancel: {
+                        btnClass: 'btn waves-effect waves-light btn-outline-secondary',
+                        action: function(){
+        
+                        }
+                    }
+                }
+            });
+        });
+});
 function resSavePartyGstDetail(data,formId){
     if(data.status==1){
         toastr.success(data.message, 'Success', { "showMethod": "slideDown", "hideMethod": "slideUp", "closeButton": true, positionClass: 'toastr toast-bottom-center', containerId: 'toast-bottom-center', "progressBar": true });

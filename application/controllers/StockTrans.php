@@ -55,6 +55,8 @@ class StockTrans extends MY_Controller{
 			$errorMessage['capacity_error'] = "Capacity is required.";
         if(empty(floatVal($data['qty'])))
 			$errorMessage['qty'] = "Qty is required.";
+        if(empty(floatVal($data['unique_id'])))
+			$errorMessage['unique_id'] = "Brand is required.";
 
         
         if(!empty($data['size_id']) && !empty($data['color']) && !empty($data['capacity'])):

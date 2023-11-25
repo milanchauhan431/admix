@@ -57,14 +57,14 @@ class CreditNote extends MY_Controller{
             $errorMessage['sp_acc_id'] = "GST Type is required.";
         if(empty($data['itemData'])):
             $errorMessage['itemData'] = "Item Details is required.";
-        else:
+        /* else:
             foreach($data['itemData'] as $key => $row):
                 if(!empty(floatVal($row['qty'])) && !empty($row['size']) && $row['item_type'] == 1):
                     if(is_int(($row['qty'] / $row['packing_qty'])) == false):
                         $errorMessage['qty'.$key] = "Invalid qty against packing standard.";
                     endif;
                 endif;
-            endforeach;
+            endforeach; */
         endif;
         
         if(!empty($errorMessage)):
