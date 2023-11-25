@@ -9,12 +9,19 @@ class Dashboard extends MY_Controller{
 		$this->data['headData']->controller = "dashboard";
 	}
 	
-	public function index(){
-	    
-		$this->data['lastSyncedAt'] = "";
-		//$this->data['lastSyncedAt'] = $this->biometric->getDeviceData()[0]->last_sync_at;
-		$this->data['lastSyncedAt'] = (!empty($this->data['lastSyncedAt'])) ? date('j F Y, g:i a',strtotime($this->data['lastSyncedAt'])) : "";
-	    $this->data['todayBirthdayList'] = array();//$this->employee->getEmpTodayBirthdayList();
+	public function index(){	    
+		$data['is_reminder'] = 1;
+		$data['due_date'] = getFyDate();
+		$data['limit'] = 20;
+		$data['report_type'] = "Receivable";
+		//$data['vou_name_s'] = "'Sale','GInc','D.N.'";
+		$data['vou_name_s'] = "'Sale','GInc'";
+		$this->data['receivableReminder'] = $this->accountReport->getDuePaymentReminderData($data);
+
+		$data['report_type'] = "Payable";
+		//$data['vou_name_s'] = "'Purc','GExp','C.N.'";
+		$data['vou_name_s'] = "'Purc','GExp'";
+		$this->data['payableReminder'] = $this->accountReport->getDuePaymentReminderData($data);
         $this->load->view('dashboard',$this->data);
     }
 	

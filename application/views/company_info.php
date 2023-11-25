@@ -158,7 +158,25 @@
                                         <label for="swift_code">Swift Code</label>
                                         <input name="swift_code" id="swift_code" class="form-control" value="<?= (!empty($dataRow->swift_code)) ? $dataRow->swift_code : "" ?>">
                                     </div>
-                                </div>                                
+                                </div>        
+                                
+                                <hr>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h4 class="card-title">Payment Reminder Settings</h4>
+                                        <input type="hidden" name="account_setting[id]" id="id" value="<?=(!empty($accountSetting->id))?$accountSetting->id:""?>">
+                                    </div>
+                                    <div class="col-md-4 form-group">
+                                        <label for="rrb_days">Receivable Reminder Before Days</label>
+                                        <input type="text" name="account_setting[rrb_days]" id="rrb_days" class="form-control numricOnly" value="<?=(!empty($accountSetting->rrb_days))?$accountSetting->rrb_days:""?>">
+                                    </div>
+
+                                    <div class="col-md-4 form-group">
+                                        <label for="prb_days">Payable Reminder Before Days</label>
+                                        <input type="text" name="account_setting[prb_days]" id="prb_days" class="form-control numricOnly" value="<?=(!empty($accountSetting->rrb_days))?$accountSetting->rrb_days:""?>">
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>

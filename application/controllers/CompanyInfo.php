@@ -10,6 +10,7 @@ class CompanyInfo extends MY_Controller{
 	
 	public function index(){
         $this->data['dataRow'] = $this->masterModel->getCompanyInfo();
+        $this->data['accountSetting'] = $this->masterModel->getAccountSettings();
         $this->data['countryData'] = $this->party->getCountries();
         $this->load->view($this->indexPage,$this->data);
     }

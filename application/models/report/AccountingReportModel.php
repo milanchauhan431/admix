@@ -66,7 +66,6 @@ class AccountingReportModel extends MasterModel{
         return $ledgerBalance;
     }
 
-
     public function getRegisterData($data){
         $queryData['tableName'] = 'trans_main';
         $queryData['select'] = 'trans_main.id,trans_main.trans_number,trans_main.doc_no,trans_main.trans_date,trans_main.order_type,trans_main.party_name,trans_main.party_state_code,trans_main.doc_no,trans_main.gstin,trans_main.currency,trans_main.vou_name_s,trans_main.total_amount,trans_main.disc_amount,trans_main.taxable_amount,trans_main.cgst_amount,trans_main.sgst_amount,trans_main.igst_amount,trans_main.cess_amount,trans_main.gst_amount,(trans_main.net_amount - trans_main.taxable_amount - trans_main.gst_amount) as other_amount,trans_main.net_amount';
@@ -163,6 +162,45 @@ class AccountingReportModel extends MasterModel{
         WHERE lb.cl_balance ".$os_type." 0 AND am.group_code IN ( 'SD','SC' ) AND am.is_delete = 0 ORDER BY am.party_name")->result();
         
         return $receivable;
+    }
+
+    public function getDuePaymentReminderData($data){
+        $paymentSetting = $this->getAccountSettings();
+        $remindarDays = ($data['report_type'] == 'Receivable')?$paymentSetting->rrb_days:$paymentSetting->prb_days;
+
+        $queryData = array();
+        $queryData['tableName'] = "trans_main";
+        $queryData['select'] = "trans_main.id,trans_main.trans_number,trans_main.trans_date,trans_main.party_id,trans_main.party_name,party_master.party_mobile,trans_main.net_amount,trans_main.rop_amount,(trans_main.net_amount - trans_main.rop_amount) as due_amount,party_master.credit_days,DATE_ADD( trans_main.trans_date,INTERVAL (party_master.credit_days) day) as due_date,DATEDIFF('".$data['due_date']."',DATE_ADD( trans_main.trans_date,INTERVAL (party_master.credit_days) day)) as due_days";
+
+        $queryData['leftJoin']['party_master'] = "trans_main.party_id = party_master.id";        
+
+        $queryData['where']["(trans_main.net_amount - trans_main.rop_amount) > "] = 0;
+        $queryData['where_in']['trans_main.vou_name_s'] = $data['vou_name_s'];
+
+        if(!empty($data['party_id'])):
+            $queryData['where']['trans_main.party_id'] = $data['party_id'];
+        endif;
+
+        if(!empty($data['is_reminder'])):
+            $queryData['customWhere'][] = "(DATEDIFF(DATE_ADD( trans_main.trans_date,INTERVAL party_master.credit_days day),'".$data['due_date']."')  BETWEEN '0' AND '".$remindarDays."')";
+        else:
+            if($data['due_type'] == "over_due"):
+                $queryData['where']["DATEDIFF('".$data['due_date']."',DATE_ADD( trans_main.trans_date,INTERVAL (party_master.credit_days) day)) >"] = 0;
+            elseif($data['due_type'] == "under_due"):
+                $queryData['where']["DATEDIFF('".$data['due_date']."',DATE_ADD( trans_main.trans_date,INTERVAL (party_master.credit_days) day)) <="] = 0;
+            else:
+                $queryData['customWhere'][] = "(DATEDIFF('".$data['due_date']."',DATE_ADD( trans_main.trans_date,INTERVAL (party_master.credit_days) day)) > 0 OR DATEDIFF('".$data['due_date']."',DATE_ADD( trans_main.trans_date,INTERVAL (party_master.credit_days) day)) <= 0)";
+            endif;
+        endif;
+        
+        $queryData['order_by']['due_date'] = "ASC";        
+        
+        if(!empty($data['limit'])):
+            $queryData['limit'] = $data['limit'];
+        endif;
+
+        $result = $this->rows($queryData);
+        return $result;
     }
 
     public function getBankCashBook($postData){
@@ -398,6 +436,5 @@ class AccountingReportModel extends MasterModel{
 
         return $result;
     }
-
 }
 ?>

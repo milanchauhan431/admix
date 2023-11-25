@@ -766,6 +766,53 @@ class AccountingReport extends MY_Controller{
         endif;
     }
 
+    public function duePaymentReminder($reportType = ""){
+        $this->data['headData']->pageUrl = "reports/accountingReport/duePaymentReminder";
+        $this->data['headData']->pageTitle = "DUE PAYMENT REMINDER";
+        $this->data['pageHeader'] = 'DUE PAYMENT REMINDER';
+        $this->data['report_type'] = $reportType;
+        $this->data['partyList'] = $this->party->getPartyList(['party_category'=>'1,2,3']);
+        $this->load->view("reports/accounting_report/due_payment_reminder",$this->data);
+    }
+
+    public function getDuePaymentReminderData(){
+        $data = $this->input->post();
+        //$data['vou_name_s'] = ($data['report_type'] == "Receivable")?"'Sale','GInc','D.N.'":"'Purc','GExp','C.N.'";
+        $data['vou_name_s'] = ($data['report_type'] == "Receivable")?"'Sale','GInc'":"'Purc','GExp'";
+        $result = $this->accountReport->getDuePaymentReminderData($data);
+
+        $tbody = '';$i = 1; $vouAmount = $ropAmount = $dueAmount = 0;
+        foreach($result as $row):
+            $tbody .= '<tr>
+                <td>'.$i++.'</td>
+                <td>'.$row->trans_number.'</td>
+                <td>'.formatDate($row->trans_date).'</td>
+                <td>'.$row->party_name.'</td>
+                <td>'.$row->party_mobile.'</td>
+                <td>'.$row->net_amount.'</td>
+                <td>'.$row->rop_amount.'</td>
+                <td>'.$row->due_amount.'</td>
+                <td>'.formatDate($row->due_date).'</td>
+                <td class="'.(($row->due_days > 0)?"text-danger":"text-success").'">'.$row->due_days.'</td>
+            </tr>';
+
+            $vouAmount += $row->net_amount;
+            $ropAmount += $row->rop_amount;
+            $dueAmount += $row->due_amount;
+        endforeach;
+
+        $tfoot = '<tr>
+            <th colspan="5" class="text-right">Total</th>
+            <th>'.$vouAmount.'</th>
+            <th>'.$ropAmount.'</th>
+            <th>'.$dueAmount.'</th>
+            <th></th>
+            <th></th>
+        </tr>';
+
+        $this->printJson(['status'=>1,'tbody'=>$tbody,'tfoot'=>$tfoot]);
+    }
+
     public function bankBook(){
         $this->data['headData']->pageUrl = "reports/accountingReport/bankBook";
         $this->data['headData']->pageTitle = "BANK BOOK";

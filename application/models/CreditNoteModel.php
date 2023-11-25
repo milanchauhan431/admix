@@ -40,7 +40,6 @@ class CreditNoteModel extends MasterModel{
         return $this->pagingRows($data);
     }
 
-
     public function save($data){
         try{
             $this->db->trans_begin();
@@ -51,11 +50,34 @@ class CreditNoteModel extends MasterModel{
             endif;
 
             if(!empty($data['id'])):                
-                $this->trash($this->transChild,['trans_main_id'=>$data['id']]);
+                $vouData = $this->getCreditNote(['id'=>$data['id'],'itemList'=>1]);
+
+                foreach($vouData->itemList as $row):
+                    if($row->stock_eff == 1 && !empty($row->ref_id)):
+                        $setData = array();
+                        $setData['tableName'] = $this->transChild;
+                        $setData['where']['id'] = $row->ref_id;
+                        $setData['set_value']['dispatch_qty'] = 'IF(`dispatch_qty` - '.$row->qty.' >= 0, `dispatch_qty` - '.$row->qty.',0)';
+                        $setData['update']['trans_status'] = "(CASE WHEN dispatch_qty >= qty THEN 1 ELSE 0 END)";
+                        $this->setValue($setData);
+                    endif;
+
+                    $this->trash($this->transChild,['id'=>$row->id]);
+                endforeach;
+
+                //$this->trash($this->transChild,['trans_main_id'=>$data['id']]);
                 $this->trash($this->transExpense,['trans_main_id'=>$data['id']]);
                 $this->remove($this->transDetails,['main_ref_id'=>$data['id'],'table_name'=>$this->transMain,'description'=>"CN TERMS"]);
                 $this->remove($this->transDetails,['main_ref_id'=>$data['id'],'table_name'=>$this->transMain,'description'=>"CN MASTER DETAILS"]);
                 $this->remove($this->stockTrans,['main_ref_id'=>$data['id'],'entry_type'=>$data['entry_type']]);
+
+                if(!empty($vouData->ref_id)):
+                    $setData = array();
+                    $setData['tableName'] = $this->transMain;
+                    $setData['where']['id'] = $vouData->ref_id;
+                    $setData['set_value']['rop_amount'] = 'IF(`rop_amount` - '.$vouData->net_amount.' >= 0, `rop_amount` - '.$vouData->net_amount.',0)';
+                    $this->setValue($setData);
+                endif;
             endif;
             
             if($data['memo_type'] == "CASH"):
@@ -137,8 +159,25 @@ class CreditNoteModel extends MasterModel{
                     ];
 
                     $this->store($this->stockTrans,$stockData);
-                endif;
+
+                    if(!empty($row['ref_id'])):
+                        $setData = array();
+                        $setData['tableName'] = $this->transChild;
+                        $setData['where']['id'] = $row['ref_id'];
+                        $setData['set']['dispatch_qty'] = 'dispatch_qty, + '.$row['qty'];
+                        $setData['update']['trans_status'] = "(CASE WHEN dispatch_qty >= qty THEN 1 ELSE 0 END)";
+                        $this->setValue($setData);
+                    endif;
+                endif;                
             endforeach;
+
+            if(!empty($data['ref_id'])):
+                $setData = array();
+                $setData['tableName'] = $this->transMain;
+                $setData['where']['id'] = $data['ref_id'];
+                $setData['set']['rop_amount'] = 'rop_amount, + '.$data['net_amount'];
+                $this->setValue($setData);
+            endif;
             
             $data['id'] = $result['id'];
             $this->transMainModel->ledgerEffects($data,$expenseData);
@@ -193,9 +232,39 @@ class CreditNoteModel extends MasterModel{
         try{
             $this->db->trans_begin();
 
+            $postData["table_name"] = $this->transMain;
+            $postData['where'] = [['column_name'=>'from_entry_type','column_value'=>$this->data['entryData']->id]];
+            $postData['find'] = [['column_name'=>'ref_id','column_value'=>$id]];
+            $checkRef = $this->checkEntryReference($postData);
+            if($checkRef['status'] == 0):
+                return $checkRef;
+            endif;
+
+            $vouData = $this->getCreditNote(['id'=>$id,'itemList'=>1]);
+            if(!empty($vouData->ref_id)):
+                $setData = array();
+                $setData['tableName'] = $this->transMain;
+                $setData['where']['id'] = $vouData->ref_id;
+                $setData['set_value']['rop_amount'] = 'IF(`rop_amount` - '.$vouData->net_amount.' >= 0, `rop_amount` - '.$vouData->net_amount.', 0)';
+                $this->setValue($setData);
+            endif;
+
+            foreach($vouData->itemList as $row):
+                if($row->stock_eff == 1 && !empty($row->ref_id)):
+                    $setData = array();
+                    $setData['tableName'] = $this->transChild;
+                    $setData['where']['id'] = $row->ref_id;
+                    $setData['set_value']['dispatch_qty'] = 'IF(`dispatch_qty` - '.$row->qty.' >= 0, `dispatch_qty` - '.$row->qty.', 0)';
+                    $setData['update']['trans_status'] = "(CASE WHEN dispatch_qty >= qty THEN 1 ELSE 0 END)";
+                    $this->setValue($setData);
+                endif;
+
+                $this->trash($this->transChild,['id'=>$row->id]);
+            endforeach;
+
             $this->transMainModel->deleteLedgerTrans($id);
 
-            $this->trash($this->transChild,['trans_main_id'=>$id]);
+            //$this->trash($this->transChild,['trans_main_id'=>$id]);
             $this->trash($this->transExpense,['trans_main_id'=>$id]);
             
             $this->remove($this->transDetails,['main_ref_id'=>$id,'table_name'=>$this->transMain,'description'=>"CN TERMS"]);

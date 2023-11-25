@@ -1,5 +1,33 @@
 var itemCount = 0;
 $(document).ready(function(){
+	$("#invItemLink").hide();
+	if($('#doc_no').val() != ""){ $("#invItemLink").show(); }
+
+	$(document).on('click','.getInvoiceItem',function(){
+		var ref_id = $('#ref_id').val();
+		var party_name = $('#party_id :selected').text();
+		$('.doc_no').html("");
+
+		if (ref_id != "" || ref_id != 0) {
+			$.ajax({
+				url: base_url + 'salesInvoice/getPartyInvoiceItems',
+				type: 'post',
+				data: { id : ref_id },
+				success: function (response) {
+					$("#modal-xl").modal();
+					$('#modal-xl .modal-body').html('');
+					$('#modal-xl .modal-title').html("Carete Invoice [ Party Name : "+party_name+" ]");
+					$('#modal-xl .modal-body').html(response);
+					$('#modal-xl .modal-body form').attr('id',"createCreditNoteForm");
+					$('#modal-xl .modal-footer .btn-save').html('<i class="fa fa-check"></i> Create Invoice');
+					$("#modal-xl .modal-footer .btn-save").attr('onclick',"createInvoice();");
+				}
+			});
+		} else {
+			$('.doc_no').html("Inv. No. is required.");
+		}	
+	});
+
     $(document).on("change",'#order_type',function(){
         var order_type = $(this).val();
 		$.ajax({ 
@@ -38,14 +66,14 @@ $(document).ready(function(){
                 $(".amountCol").show(); $(".netAmtCol").hide();
             }
             claculateColumn();
-        });
-
-		
+        });		
 
         if(order_type == "Sales Return"){
             $('#itemForm #stock_eff').val("1");
+			$(".itemStockEff").val(1);
         }else{
             $('#itemForm #stock_eff').val("0");
+			$(".itemStockEff").val(0);
         }
     });
 
@@ -192,25 +220,42 @@ $(document).ready(function(){
 	$('#doc_no').typeahead({
 		source: function(query, result){
 			$.ajax({
-				url:base_url + 'debitNote/getInvoiceList',
+				url:base_url + controller + '/getPartyInvoiceList',
 				method:"POST",
 				global:false,
 				data:{doc_no:query,party_id:$("#party_id :selected").val(),order_type:$("#order_type :selected").val()},
 				dataType:"json",
 				success:function(data){
-					result($.map(data, function(row){return {name:row.trans_number,id:row.id,doc_date:row.trans_date};}));
+					result($.map(data, function(row){return {name:row.trans_number,id:row.id,doc_date:row.trans_date,entry_type:row.entry_type};}));
 					$("#saveCreditNote #doc_date").val("");
 					$("#saveCreditNote #ref_id").val("");
+					$("#saveCreditNote #from_entry_type").val("");
+					$("#invItemLink").hide();
 				}
 			});
 		},
 		updater: function(item) {
-            $("#saveCreditNote #doc_date").val(item.doc_date || "");
+			$("#saveCreditNote #doc_date").val(item.doc_date || "");
 			$("#saveCreditNote #ref_id").val(item.id || "");
+			$("#saveCreditNote #from_entry_type").val(item.entry_type || "");
+			$("#invItemLink").show();
 			return item;
         }
 	});
 });
+
+function createInvoice(){	
+	$(".orderItem:checked").map(function() {
+		row = $(this).data('row');
+		row.qty = row.pending_qty;
+		row.gst_per = parseFloat(row.gst_per);
+		row.org_price = row.price;		
+		AddRow(row);
+	}).get();
+
+	$("#modal-xl").modal('hide');
+	$('#modal-xl .modal-body').html('');
+}
 
 function AddRow(data) {
     var tblName = "creditNoteItems";
@@ -243,7 +288,7 @@ function AddRow(data) {
 	var refIdInput = $("<input/>", { type: "hidden", name: "itemData["+itemCount+"][ref_id]", value: data.ref_id });
     var itemCodeInput = $("<input/>", { type: "hidden", name: "itemData["+itemCount+"][item_code]", value: data.item_code });
     var itemtypeInput = $("<input/>", { type: "hidden", name: "itemData["+itemCount+"][item_type]", value: data.item_type });
-	var stockEffInput = $("<input/>", { type: "hidden", name: "itemData["+itemCount+"][stock_eff]", value: data.stock_eff });
+	var stockEffInput = $("<input/>", { type: "hidden", name: "itemData["+itemCount+"][stock_eff]", class:'itemStockEff', value: data.stock_eff });
     var pormInput = $("<input/>", { type: "hidden", name: "itemData["+itemCount+"][p_or_m]", value: -1 });
 	var brandIdInput = $("<input/>", { type: "hidden", name: "itemData["+itemCount+"][brand_id]", value: data.brand_id });
     var brandNameInput = $("<input/>", { type: "hidden", name: "itemData["+itemCount+"][brand_name]", value: data.brand_name });

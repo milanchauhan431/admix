@@ -22,7 +22,7 @@
                 <!-- ============================================================== -->
                 <!-- Sales Summery -->
                 <!-- ============================================================== -->
-                <div class="row">
+                <div class="row m-b-10">
 					<div class="col-lg-3">
 						<div class="card bg-orange text-white">
 							<div class="card-body">
@@ -137,175 +137,96 @@
 					</div>
 				</div>				
 				
-				<!-- ============================================================== -->
-                <!-- Sales Order, Sales and Stock / Exchange -->
-                <!-- ============================================================== -->
-				<div class="row">
-					<div class="col-lg-12">
-					    <?php
-					        
-					    ?>
-					</div>
-			    </div>
-				<div class="row">
-					<div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <div class="row card-title">
-                                    <div class="col-lg-6">
-                                        <select class="custom-select ml-auto">
-                                            <option selected value="">Today</option>
-                                            <option value="1">Last Week</option>
-                                            <option value="1">Last Month</option>
-                                            <option value="1">Last Year</option>
-                                        </select>
-                                        <!--<symbol class="fs-20">&#8853;</symbol><symbol class="fs-20">&#8853;</symbol>
-                                        <symbol class="fs-20">&#9744;</symbol>
-                                        <symbol class="fs-20">&#9711;</symbol>
-                                        <symbol class="fs-20">&#9661;</symbol>
-                                        <symbol class="fs-20" style="text-orientation: sideways-right;writing-mode: vertical-rl;">&#9674;</symbol>
-                                        <symbol class="fs-20">&#10960;</symbol>
-                                        <symbol class="fs-20">&#9680;</symbol>
-                                        <symbol class="fs-15" style="border:1px solid #000000;padding:0px 2px;">&#9711;</symbol>
-                                        <symbol class="fs-20">&#10153;</symbol>
-                                        <symbol class="fs-20">&#128167;</symbol>-->
-                                    </div>
-                                    <div id="legendDiv" class="col-lg-6"></div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="ct-animation-chart" style="height: 300px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-						<div class="card">
-							<div class="card-header">
-                                <div class="row card-title">
-                                    <div class="col-lg-12 text-center"><h4 class="text-primary">List of today's birthday</h4></div>
-                                </div>
-                            </div>
-                            <div class="card-body" style="padding:0.4rem;background: #171618;">
-                                <div class="sales_track scrollable" style="height:300px;">
-                                    <?php
-                                        if(!empty($todayBirthdayList)):
-                                            foreach($todayBirthdayList as $row):
-                                    ?>
-                                                <div class="col-md-12 row m-b-2 bd_div" style="margin:0.25rem 0.05rem;padding:0.5rem;width: 99%;">
-                                                    <span class="border-span"> </span>
-                                                	<span class="border-span"> </span>
-                                                	<span class="border-span"> </span>
-                                                	<span class="border-span"> </span>
-                                                    <div class="col-md-3 text-center">
-                                                        <img src="<?=base_url()?>assets/images/bday.png" style="width:80%;">
-                                                    </div>
-                                                    <div class="col-md-9">
-                                                        <h5 class="fs-15 lightning_text"><?=$row->emp_name?></h5>
-                                                        <small><?=$row->emp_dsg?> (<?=$row->dept_name?>)</small>
-                                                    </div>
-                                                </div>
-                                    <?php
-                                            endforeach;
-                                        else:
-                                    ?>
-                                        <div class="text-center">
-                                            <img src="<?=base_url()?>assets/images/sad_emoji.png" style="width:60%;">
-                                            <!--<img src="<?=base_url()?>assets/images/sad.png" style="width:60%;">-->
-                                            <h5 class="m-t-5 text-white">Today is no one's birthday</h5>
-                                        </div>
-                                    <?php    
-                                        endif;
-                                    ?>
-								</div>
-                            </div>
-						</div>
-                    </div>
-                </div>
+				
                 <!-- ============================================================== -->
                 <!-- Task, Feeds -->
                 <!-- ============================================================== -->
                 <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-6">
                         <div class="card earning-widget">
                             <div class="card-body">
-                                <h4 class="m-b-0">Sellers</h4>
+                                <div class="row">   
+                                    <div class="col-md-6">
+                                        <h4 class="m-b-0">Receivable Reminder</h4>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a class="btn btn-outline-info float-right" href="<?=base_url("reports/accountingReport/duePaymentReminder/Receivable")?>">View All</a>
+                                    </div>
+                                </div>
                             </div>
                             <div class="border-top scrollable" style="height:365px;">
-                                <table class="table v-middle no-border">
+                                <table class="table v-middle table-bordered">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Party Name</th>
+                                            <th>Contact No.</th>
+                                            <th>Vou. No.</th>
+                                            <th>Vou. Date</th>
+                                            <th>Due Date</th>
+                                            <th>Due Days</th>
+                                            <th>Due Amount</th>
+                                        </tr>
+                                    </thead>
                                     <tbody>
-                                        <tr>
-                                            <td style="width:50px;">
-                                                <img src="assets/images/users/user_default.png" width="30" class="rounded-circle" alt="logo">
-                                            </td>
-                                            <td>Andrew Simon</td>
-                                            <td align="right" class="font-medium fs-15">$2300</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:50px;">
-                                                <img src="assets/images/users/user_default.png" width="30" class="rounded-circle" alt="logo">
-                                            </td>
-                                            <td>Andrew Simon</td>
-                                            <td align="right" class="font-medium fs-15">$2300</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:50px;">
-                                                <img src="assets/images/users/user_default.png" width="30" class="rounded-circle" alt="logo">
-                                            </td>
-                                            <td>Andrew Simon</td>
-                                            <td align="right" class="font-medium fs-15">$2300</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:50px;">
-                                                <img src="assets/images/users/user_default.png" width="30" class="rounded-circle" alt="logo">
-                                            </td>
-                                            <td>Andrew Simon</td>
-                                            <td align="right" class="font-medium fs-15">$2300</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:50px;">
-                                                <img src="assets/images/users/user_default.png" width="30" class="rounded-circle" alt="logo">
-                                            </td>
-                                            <td>Andrew Simon</td>
-                                            <td align="right" class="font-medium fs-15">$2300</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:50px;">
-                                                <img src="assets/images/users/user_default.png" width="30" class="rounded-circle" alt="logo">
-                                            </td>
-                                            <td>Andrew Simon</td>
-                                            <td align="right" class="font-medium fs-15">$2300</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:50px;">
-                                                <img src="assets/images/users/user_default.png" width="30" class="rounded-circle" alt="logo">
-                                            </td>
-                                            <td>Andrew Simon</td>
-                                            <td align="right" class="font-medium fs-15">$2300</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:50px;">
-                                                <img src="assets/images/users/user_default.png" width="30" class="rounded-circle" alt="logo">
-                                            </td>
-                                            <td>Andrew Simon</td>
-                                            <td align="right" class="font-medium fs-15">$2300</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:50px;">
-                                                <img src="assets/images/users/user_default.png" width="30" class="rounded-circle" alt="logo">
-                                            </td>
-                                            <td>Andrew Simon</td>
-                                            <td align="right" class="font-medium fs-15">$2300</td>
-                                        </tr>
+                                        <?php
+                                            foreach($receivableReminder as $row):
+                                                echo '<tr>
+                                                <td>'.$row->party_name.'</td>
+                                                <td>'.$row->party_mobile.'</td>
+                                                <td>'.$row->trans_number.'</td>
+                                                <td>'.formatDate($row->trans_date).'</td>
+                                                <td>'.formatDate($row->due_date).'</td>
+                                                <td class="'.(($row->due_days > 0)?"text-danger":"text-success").'">'.$row->due_days.'</td>
+                                                <td>'.$row->due_amount.'</td>
+                                            </tr>';
+                                            endforeach;
+                                        ?>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title">Credit vs Debit</h4>
-                                <div id="stacked-column"></div>
+                    <div class="col-lg-6">
+                        <div class="card earning-widget">
+                            <div class="card-body">                                
+                                <div class="row">   
+                                    <div class="col-md-6">
+                                        <h4 class="m-b-0">Payable Reminder</h4>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a class="btn btn-outline-info float-right" href="<?=base_url("reports/accountingReport/duePaymentReminder/Payable")?>">View All</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border-top scrollable" style="height:365px;">
+                                <table class="table v-middle table-bordered">
+                                    <thead class="thead-info">
+                                        <tr>
+                                            <th>Party Name</th>
+                                            <th>Contact No.</th>
+                                            <th>Vou. No.</th>
+                                            <th>Vou. Date</th>
+                                            <th>Due Date</th>
+                                            <th>Due Days</th>
+                                            <th>Due Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                            foreach($payableReminder as $row):
+                                                echo '<tr>
+                                                <td>'.$row->party_name.'</td>
+                                                <td>'.$row->party_mobile.'</td>
+                                                <td>'.$row->trans_number.'</td>
+                                                <td>'.formatDate($row->trans_date).'</td>
+                                                <td>'.formatDate($row->due_date).'</td>
+                                                <td class="'.(($row->due_days > 0)?"text-danger":"text-success").'">'.$row->due_days.'</td>
+                                                <td>'.$row->due_amount.'</td>
+                                            </tr>';
+                                            endforeach;
+                                        ?>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

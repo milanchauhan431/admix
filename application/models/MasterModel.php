@@ -851,6 +851,14 @@ class MasterModel extends CI_Model{
 				endif;            
 			endif;
 
+            if(isset($data['set_value'])):
+				if(!empty($data['set_value'])):
+					foreach($data['set_value'] as $key=>$value):
+						$this->db->set($key, $value, FALSE);
+					endforeach;
+				endif;            
+			endif;
+
             if(isset($data['update'])):
 				if(!empty($data['update'])):
 					foreach($data['update'] as $key=>$value):
@@ -890,6 +898,9 @@ class MasterModel extends CI_Model{
         try{
             $this->db->trans_begin();
 
+            $account_setting = $postData['account_setting'];unset($postData['account_setting']);
+            $this->store('account_setting',$account_setting);
+
             $result = $this->store('company_info',$postData,'Company Info');
 
             if ($this->db->trans_status() !== FALSE):
@@ -900,6 +911,12 @@ class MasterModel extends CI_Model{
             $this->db->trans_rollback();
             return ['status'=>2,'message'=>"somthing is wrong. Error : ".$e->getMessage()];
         }	
+    }
+
+    public function getAccountSettings(){
+        $data['tableName'] = 'account_setting';
+        $data['where']['account_setting.id'] = 1;
+		return $this->row($data);
     }
 
     /* 
@@ -964,6 +981,33 @@ class MasterModel extends CI_Model{
             if($res > 0): return true; endif;
         endif;
         return false;
+    }
+
+    /* 
+    * Created BY : Milan Chauhan
+    * Created AT : 27-10-2023
+    * Required Param : tableName => columnName (array) and id any special conditions
+    */
+    public function checkEntryReference($postData){
+        $queryData = array();
+        $queryData['tableName'] = $postData['table_name'];
+        $queryData['select'] = "COUNT(id) as count,GROUP_CONCAT(DISTINCT(vou_name_l) SEPARATOR ', ') as entry_ref";
+
+        foreach($postData["where"] as $row):
+            $queryData['where'][$row['column_name']] = $row['column_value'];
+        endforeach;
+
+        foreach($postData["find"] as $row):
+            $queryData['customWhere'][] = "FIND_IN_SET(".$row['column_value'].",".$row['column_name'].") > 0";
+        endforeach;
+
+        $result = $this->row($queryData);
+
+        if(!empty($result->count)):
+            return ['status'=>0,'message' => 'Entry Ref. Found. You can not delete it. Vou Name : '.$result->entry_ref];
+        endif;
+
+        return ['status'=>1,'message' => 'Entry Ref. not found.'];
     }
 }
 ?>

@@ -107,6 +107,9 @@
 
                                     <div class="col-md-2 form-group">
                                         <label for="doc_no">Inv. No.</label>
+                                        <div class="float-right" id="invItemLink">
+                                            <a class="text-primary font-bold waves-effect waves-dark getInvoiceItem" href="javascript:void(0)">+ Add Item</a>
+										</div>
                                         <input type="text" name="doc_no" id="doc_no" class="form-control" value="<?=(!empty($dataRow->doc_no))?$dataRow->doc_no:""?>">
                                     </div>
 

@@ -204,10 +204,5 @@ class DebitNote extends MY_Controller{
 		$mpdf->WriteHTML($pdfData);
 		$mpdf->Output($pdfFileName,'I');
     }
-
-    public function getInvoiceList(){
-        $data = $this->input->post();
-        $this->printJson($this->debitNote->getInvocieList($data));
-    }
 }
 ?>

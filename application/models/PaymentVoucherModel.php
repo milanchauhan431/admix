@@ -52,14 +52,36 @@ class PaymentVoucherModel extends MasterModel{
 		try{
 			$this->db->trans_begin();
 
+            if(empty($data['id'])):
+                if($data['vou_name_s'] == "BCRct"):
+                    $data['trans_prefix'] = $this->data['entryData']->trans_prefix;
+                else:
+                    $data['trans_prefix'] = str_replace("R","P",$this->data['entryData']->trans_prefix);
+                endif;
+                
+                $data['trans_no'] = $this->transMainModel->nextTransNo($this->data['entryData']->id,0,$data['vou_name_s']);
+                $data['trans_number']	= $data['trans_prefix'].$data['trans_no'];
+            endif;
+
             if(!empty($data['id'])):
                 $vouData = $this->getVoucher($data['id']);
                 if(!empty($vouData->ref_id)):
                     $setData = array();
                     $setData['tableName'] = $this->transMain;
                     $setData['where']['id'] = $vouData->ref_id;
-                    $setData['set']['rop_amount'] = 'rop_amount, - '.$vouData->net_amount;
+                    $setData['set_value']['rop_amount'] = 'IF(`rop_amount` - '.$vouData->net_amount.' >= 0, `rop_amount` - '.$vouData->net_amount.', 0)';
                     $this->setValue($setData);
+                endif;
+
+                if($vouData->vou_name_s != $data['vou_name_s']):
+                    if($data['vou_name_s'] == "BCRct"):
+                        $data['trans_prefix'] = $this->data['entryData']->trans_prefix;
+                    else:
+                        $data['trans_prefix'] = str_replace("R","P",$this->data['entryData']->trans_prefix);
+                    endif;
+                    
+                    $data['trans_no'] = $this->transMainModel->nextTransNo($this->data['entryData']->id,0,$data['vou_name_s']);
+                    $data['trans_number']	= $data['trans_prefix'].$data['trans_no'];
                 endif;
             endif;
 
@@ -106,7 +128,7 @@ class PaymentVoucherModel extends MasterModel{
                 $setData = array();
                 $setData['tableName'] = $this->transMain;
                 $setData['where']['id'] = $vouData->ref_id;
-                $setData['set']['rop_amount'] = 'rop_amount, - '.$vouData->net_amount;
+                $setData['set_value']['rop_amount'] = 'IF(`rop_amount` - '.$vouData->net_amount.' >= 0, `rop_amount` - '.$vouData->net_amount.', 0)';
                 $this->setValue($setData);
             endif;
 			

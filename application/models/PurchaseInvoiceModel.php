@@ -33,7 +33,6 @@ class PurchaseInvoiceModel extends MasterModel{
         return $this->pagingRows($data);
     }
 
-
     public function save($data){
         try{
             $this->db->trans_begin();
@@ -50,7 +49,7 @@ class PurchaseInvoiceModel extends MasterModel{
                         $setData = array();
                         $setData['tableName'] = "mir_transaction";
                         $setData['where']['id'] = $row->ref_id;
-                        $setData['set']['inv_qty'] = 'inv_qty, - '.$row->qty;
+                        $setData['set_value']['inv_qty'] = 'IF(`inv_qty` - '.$row->qty.' >= 0, `inv_qty` - '.$row->qty.', 0)';
                         $setData['update']['trans_status'] = "(CASE WHEN inv_qty >= qty THEN 1 ELSE 0 END)";
                         $this->setValue($setData);
                     endif;
@@ -59,7 +58,7 @@ class PurchaseInvoiceModel extends MasterModel{
                         $setData = array();
                         $setData['tableName'] = $this->transChild;
                         $setData['where']['id'] = $row->ref_id;
-                        $setData['set']['dispatch_qty'] = 'dispatch_qty, - '.$row->qty;
+                        $setData['set_value']['dispatch_qty'] = 'IF(`dispatch_qty` - '.$row->qty.' >= 0, `dispatch_qty` - '.$row->qty.', 0)';
                         $setData['update']['trans_status'] = "(CASE WHEN dispatch_qty >= qty THEN 1 ELSE 0 END)";
                         $this->setValue($setData);
                     endif;
@@ -294,6 +293,14 @@ class PurchaseInvoiceModel extends MasterModel{
         try{
             $this->db->trans_begin();
 
+            $postData["table_name"] = $this->transMain;
+            $postData['where'] = [['column_name'=>'from_entry_type','column_value'=>$this->data['entryData']->id]];
+            $postData['find'] = [['column_name'=>'ref_id','column_value'=>$id]];
+            $checkRef = $this->checkEntryReference($postData);
+            if($checkRef['status'] == 0):
+                return $checkRef;
+            endif;
+
             $dataRow = $this->getPurchaseInvoice(['id'=>$id,'itemList'=>1]);
 
             foreach($dataRow->itemList as $row):
@@ -301,7 +308,7 @@ class PurchaseInvoiceModel extends MasterModel{
                     $setData = array();
                     $setData['tableName'] = "mir_transaction";
                     $setData['where']['id'] = $row->ref_id;
-                    $setData['set']['inv_qty'] = 'inv_qty, - '.$row->qty;
+                    $setData['set_value']['inv_qty'] = 'IF(`inv_qty` - '.$row->qty.' >= 0, `inv_qty` - '.$row->qty.', 0)';
                     $setData['update']['trans_status'] = "(CASE WHEN inv_qty >= qty THEN 1 ELSE 0 END)";
                     $this->setValue($setData);
                 endif;
@@ -310,7 +317,7 @@ class PurchaseInvoiceModel extends MasterModel{
                     $setData = array();
                     $setData['tableName'] = $this->transChild;
                     $setData['where']['id'] = $row->ref_id;
-                    $setData['set']['dispatch_qty'] = 'dispatch_qty, - '.$row->qty;
+                    $setData['set_value']['dispatch_qty'] = 'IF(`dispatch_qty` - '.$row->qty.' >= 0, `dispatch_qty` - '.$row->qty.', 0)';
                     $setData['update']['trans_status'] = "(CASE WHEN dispatch_qty >= qty THEN 1 ELSE 0 END)";
                     $this->setValue($setData);
                 endif;
@@ -360,5 +367,19 @@ class PurchaseInvoiceModel extends MasterModel{
             return ['status'=>2,'message'=>"somthing is wrong. Error : ".$e->getMessage()];
         }
     }
+
+    public function getPendingInvoiceItems($data){
+        $queryData = array();
+        $queryData['tableName'] = $this->transChild;
+        $queryData['select'] = "trans_child.*,(trans_child.qty - trans_child.dispatch_qty) as pending_qty,trans_main.entry_type as main_entry_type,trans_main.trans_number,trans_main.trans_date,trans_main.doc_no,";
+
+        $queryData['leftJoin']['trans_main'] = "trans_child.trans_main_id = trans_main.id";
+
+        $queryData['where']['trans_main.id'] = $data['id'];
+        $queryData['where']['trans_child.entry_type'] = $this->data['entryData']->id;
+        $queryData['where']['(trans_child.qty - trans_child.dispatch_qty) >'] = 0;
+        return $this->rows($queryData);
+    }
+
 }
 ?>
