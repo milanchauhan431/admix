@@ -247,7 +247,7 @@ class AccountingReportModel extends MasterModel{
         $result = $this->db->query("SELECT DATE_FORMAT(monthList.date_range,'%M, %Y') AS month_name, tm.total_taxable_amount, tm.total_cgst_amount, tm.total_sgst_amount, tm.total_igst_amount, tm.total_net_amount
         FROM (
             SELECT (date_add(@start_date, INTERVAL (@months := @months +1 ) month)) as date_range
-            FROM mysql.help_topic monthList
+            FROM information_schema.COLUMNS monthList
         ) monthList
         LEFT JOIN (
             SELECT DATE_FORMAT(trans_date,'%Y-%m') as month_name, SUM(taxable_amount) as total_taxable_amount, SUM(cgst_amount) as total_cgst_amount, SUM(sgst_amount) as total_sgst_amount, SUM(igst_amount) as total_igst_amount, SUM(net_amount) as total_net_amount
