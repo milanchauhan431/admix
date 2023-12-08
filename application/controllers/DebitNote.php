@@ -178,6 +178,7 @@ class DebitNote extends MY_Controller{
 		$response="";
 		$logo=base_url('assets/images/logo.png');
 		$this->data['letter_head']=base_url('assets/images/letterhead-top.png');
+        $lh_bg =  base_url('assets/images/lh_bg.jpg');
 				
         $pdfData = "";
         $countPT = count($printTypes); $i=0;
@@ -200,7 +201,13 @@ class DebitNote extends MY_Controller{
 		
 		/* $mpdf->SetHTMLHeader($htmlHeader);
 		$mpdf->SetHTMLFooter($htmlFooter); */
-		$mpdf->AddPage('P','','','','',10,5,(($postData['header_footer'] == 1)?5:35),5,5,5,'','','','','','','','','','A4-P');
+		//$mpdf->AddPage('P','','','','',10,5,(($postData['header_footer'] == 1)?5:35),5,5,5,'','','','','','','','','','A4-P');
+        if($postData['header_footer'] == 1):
+            $mpdf->SetDefaultBodyCSS('background', "url('".$lh_bg."')");
+            $mpdf->SetDefaultBodyCSS('background-image-resize', 6);
+		endif;
+        $mpdf->AddPage('P','','','','',7,13,43,7,3,15,'','','','','','','','','','A4-P');
+        
 		$mpdf->WriteHTML($pdfData);
 		$mpdf->Output($pdfFileName,'I');
     }

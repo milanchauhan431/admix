@@ -124,14 +124,9 @@
                                         <th colspan="2" class="text-right">'.$row->exp_name.'</th>
                                         <td class="text-right">'.sprintf('%.2f',$expAmt).'</td>
                                     </tr>';
-                                endif;                                
-                            else:
-                                $afterExp .= '<tr>
-                                    <th colspan="2" class="text-right">'.$row->exp_name.'</th>
-                                    <td class="text-right">'.sprintf('%.2f',$expAmt).'</td>
-                                </tr>';
+                                endif;
+                                $rwspan++;
                             endif;
-                            $rwspan++;
                         endif;
                     endforeach;
 
@@ -153,6 +148,30 @@
                             $rwspan++;
                         endif;
                     endforeach;
+
+                    foreach ($expenseList as $row) :
+                        $expAmt = 0;
+                        $amtFiledName = $row->map_code . "_amount";
+                        if (!empty($invExpenseData) && $row->map_code != "roff") :
+                            $expAmt = floatVal($invExpenseData->{$amtFiledName});
+                        endif;
+
+                        if(!empty($expAmt)):
+                            if ($row->position == 2) :
+                                if($rwspan == 0):
+                                    $afterExp .= '<th colspan="2" class="text-right">'.$row->exp_name.'</th>
+                                    <td class="text-right">'.sprintf('%.2f',$expAmt).'</td>';
+                                else:
+                                    $afterExp .= '<tr>
+                                        <th colspan="2" class="text-right">'.$row->exp_name.'</th>
+                                        <td class="text-right">'.sprintf('%.2f',$expAmt).'</td>
+                                    </tr>';
+                                endif;
+                                $rwspan++;
+                            endif;
+                        endif;
+                    endforeach;
+
                     $fixRwSpan = (!empty($rwspan))?3:0;
                 ?>
                 <tr>
@@ -193,9 +212,6 @@
                 </tr>
                 
                 <?php if(!empty($rwspan)): ?>
-                <!-- <tr>
-                    
-                </tr> -->
                 <tr>
                     <th colspan="2" class="text-right">Grand Total</th>
                     <th class="text-right"><?=sprintf('%.2f',$invData->net_amount)?></th>

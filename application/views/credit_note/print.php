@@ -1,16 +1,19 @@
+<div style="font-size:15px;font-weight:500;position:fixed;top:-21mm;right:-15px;text-align:right;color:#343434">
+    1, Umakant Pandit Udhyog Nagar,<br>Nr. Anand Bunglow Chowk,<br>Rajkot-360005
+</div>
 <div class="row">
     <div class="col-12">
         <?php if(!empty($header_footer)): ?>
-        <table>
+        <!-- <table>
             <tr>
                 <td>
                     <img src="<?=$letter_head?>" class="img">
                 </td>
             </tr>
-        </table>
+        </table> -->
         <?php endif; ?>
 
-        <table class="table bg-light-grey">
+        <table class="table bg-light-grey" style="margin-left:12px;width:97%;">
             <tr class="" style="letter-spacing: 2px;font-weight:bold;padding:2px !important; border-bottom:1px solid #000000;">
                 <td style="width:33%;" class="fs-18 text-left">
                     GSTIN: <?=$companyData->company_gst_no?>
@@ -22,7 +25,7 @@
             </tr>
         </table>
         
-        <table class="table item-list-bb fs-22" style="margin-top:5px;">
+        <table class="table item-list-bb fs-22" style="margin-top:5px;width:97%;">
             <tr>
                 <td style="width:60%; vertical-align:top;" rowspan="5">
                     <b>M/S. <?=$invData->party_name?></b><br>
@@ -70,7 +73,7 @@
             </tr>
         </table>
         
-        <table class="table item-list-bb" style="margin-top:10px;">
+        <table class="table item-list-bb" style="margin-top:10px;" style="margin-top:10px;width:97%;">
             <?php $thead = '<thead>
                     <tr>
                         <th style="width:40px;">No.</th>
@@ -157,14 +160,9 @@
                                         <th colspan="2" class="text-right">'.$row->exp_name.'</th>
                                         <td class="text-right">'.sprintf('%.2f',$expAmt).'</td>
                                     </tr>';
-                                endif;                                
-                            else:
-                                $afterExp .= '<tr>
-                                    <th colspan="2" class="text-right">'.$row->exp_name.'</th>
-                                    <td class="text-right">'.sprintf('%.2f',$expAmt).'</td>
-                                </tr>';
+                                endif;
+                                $rwspan++;
                             endif;
-                            $rwspan++;
                         endif;
                     endforeach;
 
@@ -186,6 +184,31 @@
                             $rwspan++;
                         endif;
                     endforeach;
+
+                    foreach ($expenseList as $row) :
+                        $expAmt = 0;
+                        $amtFiledName = $row->map_code . "_amount";
+                        if (!empty($invExpenseData) && $row->map_code != "roff") :
+                            $expAmt = floatVal($invExpenseData->{$amtFiledName});
+                        endif;
+
+                        if(!empty($expAmt)):
+                            if ($row->position == 2) :
+                                if($rwspan == 0):
+                                    $afterExp .= '<th colspan="2" class="text-right">'.$row->exp_name.'</th>
+                                    <td class="text-right">'.sprintf('%.2f',$expAmt).'</td>';
+                                else:
+                                    $afterExp .= '<tr>
+                                        <th colspan="2" class="text-right">'.$row->exp_name.'</th>
+                                        <td class="text-right">'.sprintf('%.2f',$expAmt).'</td>
+                                    </tr>';
+                                endif;
+                                $rwspan++;
+                            endif;
+                        endif;
+                    endforeach;
+
+                    $fixRwSpan = (!empty($rwspan))?3:0;
                 ?>
                 <tr>
                     <th colspan="3" class="text-right">Total Qty.</th>
@@ -201,6 +224,10 @@
                         <b>IFSC Code : </b><?=$companyData->company_ifsc_code?><br>
                         <b>Branch : </b><?=$companyData->company_bank_branch?>
                     </th>
+                    <?php if(empty($rwspan)): ?>
+                        <th colspan="2" class="text-right">Round Off</th>
+                        <td class="text-right"><?=sprintf('%.2f',$invData->round_off_amount)?></td>
+                    <?php endif; ?>
                 </tr>
                 <!-- <tr>
                     <th class="text-left" colspan="5" rowspan="2">
@@ -211,49 +238,54 @@
                 <tr>
                     <th class="text-left" colspan="5" rowspan="3">
                         Amount In Words : <br><?=numToWordEnglish(sprintf('%.2f',$invData->net_amount))?>
-                    </th>				
+                    </th>
+
+                    <?php if(empty($rwspan)): ?>
+                        <th colspan="2" class="text-right">Grand Total</th>
+                        <th class="text-right"><?=sprintf('%.2f',$invData->net_amount)?></th>
+                    <?php else: ?>
+                        <th colspan="2" class="text-right">Round Off</th>
+                        <td class="text-right"><?=sprintf('%.2f',$invData->round_off_amount)?></td>
+                    <?php endif; ?>
                 </tr>
                 
-                <tr>
-                    <th colspan="2" class="text-right">Round Off</th>
-                    <td class="text-right"><?=sprintf('%.2f',$invData->round_off_amount)?></td>
-                </tr>
+                <?php if(!empty($rwspan)): ?>
                 <tr>
                     <th colspan="2" class="text-right">Grand Total</th>
                     <th class="text-right"><?=sprintf('%.2f',$invData->net_amount)?></th>
                 </tr>
+                <?php endif; ?>
             </tbody>
         </table>
 
-        <h4>Terms & Conditions :-</h4>
-        <table class="table top-table" style="margin-top:10px;">
-            <?php
-                if(!empty($invData->termsConditions)):
-                    foreach($invData->termsConditions as $row):
-                        echo '<tr>';
-                            /* echo '<th class="text-left fs-11" style="width:140px;">'.$row->term_title.'</th>'; */
-                            echo '<td class=" fs-11"><ul><li> '.$row->condition.' </li></ul></td>';
-                        echo '</tr>';
-                    endforeach;
-                endif;
-            ?>
-        </table>
-        
-        <table>
+        <table style="border-top:1px solid #545454;margin-top:10px;width:92%;">
             <tr>
-                <th colspan="2" style="vertical-align:bottom;text-align:right;font-size:1rem;padding:5px 2px;">
+                <th class="text-left" style="width:60%;">
+                    <h4>Terms & Conditions :-</h4>
+                </th>
+                <th style="vertical-align:bottom;text-align:right;font-size:1rem;padding:5px 2px;">
                     For, <?=$companyData->company_name?><br>
                 </th>
             </tr>
             <tr>
-                <td colspan="2" height="35"></td>
+                <td class="fs-11">
+                    <?php
+                        if(!empty($invData->termsConditions)):
+                            foreach($invData->termsConditions as $row):
+                                    echo '<ul><li> '.$row->condition.' </li></ul>';
+                            endforeach;
+                        endif;
+                    ?>
+                </td>
+                <td height="35"></td>
             </tr>
             <tr>
-                <td colspan="2" style="vertical-align:bottom;text-align:right;font-size:1rem;padding:5px 2px;"><b>Authorised Signature</b></td>
+                <td></td>
+                <td style="vertical-align:bottom;text-align:right;font-size:1rem;padding:5px 2px;"><b>Authorised Signature</b></td>
             </tr>
         </table>
 
-        <table class="table top-table" style="margin-top:10px; border-top:1px solid #545454;">
+        <table class="table top-table" style="margin-top:10px; border-top:1px solid #545454;width:92%;">
             <tr>
                 <td style="width:25%;font-size:12px;">This is computer generated Credit Note.</td>
             </tr>
