@@ -110,6 +110,25 @@
                                         <label for="master_t_col_4">Pincode</label>
                                         <input type="text" name="masterDetails[t_col_4]" id="master_t_col_4" class="form-control" value="<?=(!empty($dataRow->ship_pincode))?$dataRow->ship_pincode:""?>">
                                     </div>
+
+                                    <div class="col-md-3 form-group">
+                                        <label for="master_i_col_1">Transport Name</label>
+                                        <select name="masterDetails[i_col_1]" id="master_i_col_1" class="form-control select2">
+                                            <option value="">Select Transapoter</option>
+                                            <?php
+                                                foreach($transportList as $row):
+                                                    $selected = (!empty($dataRow->transport_id) && $dataRow->transport_id == $row->id)?"selected":"";
+                                                    echo '<option value="'.$row->id.'" data-t_id="'.$row->transport_id.'" '.$selected.'>'.$row->transport_name.'</option>';
+                                                endforeach;
+                                            ?>
+                                        </select>
+                                        <input type="hidden" name="masterDetails[t_col_5]" id="master_t_col_5" value="<?=(!empty($dataRow->transaport_name))?$dataRow->transaport_name:""?>">                                        
+                                    </div>
+
+                                    <div class="col-md-3 form-group">
+                                        <label for="master_t_col_6">Trasport Id</label>
+                                        <input type="text" name="masterDetails[t_col_6]" id="master_t_col_6" class="form-control" value="<?=(!empty($dataRow->transaport_gst_no))?$dataRow->transaport_gst_no:""?>" readonly />
+                                    </div>
                                 </div>
 
                                 <hr>

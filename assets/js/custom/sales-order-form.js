@@ -149,6 +149,17 @@ $(document).ready(function(){
 		$("#gst_per").val(($("#hsn_code :selected").data('gst_per') || 0));
 		$("#gst_per").select2();
 	});
+
+	$(document).on('change','#master_i_col_1',function(){
+		var transport_id = $(this).val();
+		if(transport_id != ""){
+			$("#master_t_col_5").val($("#master_i_col_1 :selected").text());
+			$("#master_t_col_6").val($("#master_i_col_1 :selected").data('t_id'));
+		}else{
+			$("#master_t_col_5").val("");
+			$("#master_t_col_6").val("");
+		}
+	});
 });
 
 function createOrder(){

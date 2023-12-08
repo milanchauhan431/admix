@@ -166,7 +166,7 @@ class SalesOrderModel extends MasterModel{
     public function getSalesOrder($data){
         $queryData = array();
         $queryData['tableName'] = $this->transMain;
-        $queryData['select'] = "trans_main.*,trans_details.t_col_1 as contact_person,trans_details.t_col_2 as contact_no,trans_details.t_col_3 as ship_address,,trans_details.t_col_4 as ship_pincode,employee_master.emp_name as created_name";
+        $queryData['select'] = "trans_main.*,trans_details.t_col_1 as contact_person,trans_details.t_col_2 as contact_no,trans_details.t_col_3 as ship_address,,trans_details.t_col_4 as ship_pincode,trans_details.i_col_1 as transport_id,trans_details.t_col_5 as transaport_name,trans_details.t_col_6 as transaport_gst_no,employee_master.emp_name as created_name";
 
         $queryData['leftJoin']['trans_details'] = "trans_main.id = trans_details.main_ref_id AND trans_details.description = 'SO MASTER DETAILS' AND trans_details.table_name = '".$this->transMain."'";
         $queryData['leftJoin']['employee_master'] = "employee_master.id = trans_main.created_by";
@@ -197,7 +197,8 @@ class SalesOrderModel extends MasterModel{
     public function getSalesOrderItems($data){
         $queryData = array();
         $queryData['tableName'] = $this->transChild;
-        $queryData['select'] = "trans_child.*,tmref.trans_number as ref_number";
+        $queryData['select'] = "trans_child.*,tmref.trans_number as ref_number,item_master.wkg";
+        $queryData['leftJoin']['item_master'] = "item_master.id = trans_child.item_id";
         $queryData['leftJoin']['trans_child as tcref'] = "tcref.id = trans_child.ref_id";
         $queryData['leftJoin']['trans_main as tmref'] = "tcref.trans_main_id = tmref.id";
         $queryData['where']['trans_child.trans_main_id'] = $data['id'];
