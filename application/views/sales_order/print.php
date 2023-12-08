@@ -30,7 +30,7 @@
                 
                 <table class="table item-list-bb fs-22" style="margin-top:5px;width:97%;">
                     <tr >
-                        <td rowspan="4" style="width:67%;vertical-align:top;">
+                        <td rowspan="5" style="width:67%;vertical-align:top;">
                             <b>M/S. <?=$dataRow->party_name?></b><br>
                             <?=(!empty($dataRow->ship_address) ? $dataRow->ship_address ." - ".$dataRow->ship_pincode : '')?><br>
                             <b>Kind. Attn. : <?=$dataRow->contact_person?></b> <br>
@@ -39,11 +39,15 @@
                             GSTIN : <?=$dataRow->gstin?>
                         </td>
                         <td>
-                            <b>SO. No. : <?=$dataRow->trans_number?></b>
+                            <b>SO. No.</b>
                         </td>
                         <td>
-                            <b>Date : <?=formatDate($dataRow->trans_date)?></b>
+                            <?=$dataRow->trans_number?>
                         </td>
+                    </tr>
+                    <tr>
+                        <th class="text-left">SO. Date</th>
+                        <td><?=formatDate($dataRow->trans_date)?></td>
                     </tr>
                     <tr>
                         <th class="text-left">Cust. PO. No.</th>
