@@ -2281,7 +2281,7 @@ class GstReport extends MY_Controller{
     }
 
     public function matchGstr2bData(){
-        $data = $this->input->post(); //print_r($_FILES);exit;
+        $data = $this->input->post();
         if(empty($data['from_date']))
             $errorMessage["from_date"] = "From date is required.";
         if(empty($data['to_date']))
@@ -2305,8 +2305,7 @@ class GstReport extends MY_Controller{
             $jsonData = file_get_contents($filePath);
 
             // Parse the JSON data
-            $gstr2Data = json_decode($jsonData, false);
-            
+            $gstr2Data = json_decode($jsonData, false);            
 
             $data['report'] = "gstr2"; $tbody = '';
             if($gstr2Data !== null):
@@ -2314,9 +2313,9 @@ class GstReport extends MY_Controller{
                     if(in_array($key,['b2b'])):
 
                         if(in_array($key,['b2b','b2bur','imps','impg'])):
-                            $data['entry_type'] = '12,18';
+                            $data['vou_name_s'] = "'Purc','GExp'";
                         elseif(in_array($key,['cdnr','cdnur'])):
-                            $data['entry_type'] = '13,14';
+                            $data['vou_name_s'] = "'C.N.','D.N.'";
                         endif;
 
                         $result = $this->gstReport->{"_".$key}($data);
@@ -2373,7 +2372,7 @@ class GstReport extends MY_Controller{
                                             floatVal($resultRow->sgst_amount) == floatVal($jsonRow->sgst) &&
                                             floatVal($resultRow->igst_amount) == floatVal($jsonRow->igst) &&
                                             floatVal($resultRow->cess_amount) == floatVal($jsonRow->cess) &&
-                                            trim($resultRow->doc_no) == trim($jsonRow->inum) &&
+                                            trim($resultRow->trans_number) == trim($jsonRow->inum) &&
                                             formatDate($resultRow->trans_date) == formatDate($jsonRow->dt)
                                         ):
                                             $matchingStatus = true; 
@@ -2381,7 +2380,7 @@ class GstReport extends MY_Controller{
 
                                         if(
                                             trim($resultRow->gstin) == trim($jsonRow->ctin) &&
-                                            trim($resultRow->doc_no) == trim($jsonRow->inum) &&
+                                            trim($resultRow->trans_number) == trim($jsonRow->inum) &&
                                             formatDate($resultRow->trans_date) == formatDate($jsonRow->dt)
                                         ):
                                             $matchingRow = $jsonRow;
@@ -2393,6 +2392,15 @@ class GstReport extends MY_Controller{
 
                                     $bgColor = ($matchingStatus == true) ? "#cdffcd" : "#fdbec4";
                                     $status = ($matchingStatus == true) ? "Matched" : "Unmatched";
+                                    $isRc = (in_array($resultRow->itc,["Capital Goods"]))?"Y":"N";
+                                    $invType = "Regular";
+                                    if($resultRow->tax_class == "SEZSGSTACC"):
+                                        $invType = "SEZ supplies with payment";
+                                    elseif($resultRow->tax_class == "SEZSGSTACC"):
+                                        $invType = "SEZ supplies without payment";
+                                    elseif($resultRow->tax_class == "SEZSGSTACC"):
+                                        $invType = "Deemed Exp";
+                                    endif;
 
                                     //Erp Data                                    
                                     $tbodyHtml .= '<tr style="background-color: '.$bgColor.'; ">
@@ -2400,12 +2408,12 @@ class GstReport extends MY_Controller{
                                         <td>'.strtoupper($key).'</td>
                                         <td>'.$resultRow->gstin.'</td>
                                         <td>'.$resultRow->party_name.'</td>
-                                        <td>'.$resultRow->doc_no.'</td>
+                                        <td>'.$resultRow->trans_number.'</td>
                                         <td>'.formatDate($resultRow->trans_date).'</td>
                                         <td>'.$resultRow->net_amount.'</td>
-                                        <td>N</td>
-                                        <td>'.$resultRow->gst_statecode.'</td>
-                                        <td>R</td>
+                                        <td>'.$isRc.'</td>
+                                        <td>'.$resultRow->party_state_code.'</td>
+                                        <td>'.$invType.'</td>
                                         <td>'.$resultRow->taxable_amount.'</td>
                                         <td>'.$resultRow->gst_per.'</td>
                                         <td>'.$resultRow->cgst_amount.'</td>
@@ -2502,7 +2510,7 @@ class GstReport extends MY_Controller{
                                             floatVal($resultRow->sgst_amount) == floatVal($jsonRow->sgst) &&
                                             floatVal($resultRow->igst_amount) == floatVal($jsonRow->igst) &&
                                             floatVal($resultRow->cess_amount) == floatVal($jsonRow->cess) &&
-                                            trim($resultRow->doc_no) == trim($jsonRow->inum) &&
+                                            trim($resultRow->trans_number) == trim($jsonRow->inum) &&
                                             formatDate($resultRow->trans_date) == formatDate($jsonRow->dt)
                                         ):
                                             $matchingStatus = true;                                            
@@ -2510,7 +2518,7 @@ class GstReport extends MY_Controller{
                                         
                                         if(
                                             trim($resultRow->gstin) == trim($jsonRow->ctin) &&
-                                            trim($resultRow->doc_no) == trim($jsonRow->inum) &&
+                                            trim($resultRow->trans_number) == trim($jsonRow->inum) &&
                                             formatDate($resultRow->trans_date) == formatDate($jsonRow->dt)
                                         ):
                                             $matchingRow = $resultRow;
@@ -2520,6 +2528,15 @@ class GstReport extends MY_Controller{
 
                                     $bgColor = ($matchingStatus == true) ? "#cdffcd" : "#fdbec4";
                                     $status = ($matchingStatus == true) ? "Matched" : "Unmatched";
+                                    $isRc = (in_array($matchingRow->itc,["Capital Goods"]))?"Y":"N";
+                                    $invType = "Regular";
+                                    if($matchingRow->tax_class == "SEZSGSTACC"):
+                                        $invType = "SEZ supplies with payment";
+                                    elseif($matchingRow->tax_class == "SEZSGSTACC"):
+                                        $invType = "SEZ supplies without payment";
+                                    elseif($matchingRow->tax_class == "SEZSGSTACC"):
+                                        $invType = "Deemed Exp";
+                                    endif;
 
                                     //Erp Data
                                     if(!empty($matchingRow)):
@@ -2528,12 +2545,12 @@ class GstReport extends MY_Controller{
                                             <td>'.strtoupper($key).'</td>
                                             <td>'.$matchingRow->gstin.'</td>
                                             <td>'.$matchingRow->party_name.'</td>
-                                            <td>'.$matchingRow->doc_no.'</td>
+                                            <td>'.$matchingRow->trans_number.'</td>
                                             <td>'.formatDate($matchingRow->trans_date).'</td>
                                             <td>'.floatVal($matchingRow->net_amount).'</td>
-                                            <td>N</td>
-                                            <td>'.$matchingRow->gst_statecode.'</td>
-                                            <td>R</td>
+                                            <td>'.$isRc.'</td>
+                                            <td>'.$matchingRow->party_state_code.'</td>
+                                            <td>'.$invType.'</td>
                                             <td>'.floatVal($matchingRow->taxable_amount).'</td>
                                             <td>'.floatVal($matchingRow->gst_per).'</td>
                                             <td>'.floatVal($matchingRow->cgst_amount).'</td>
@@ -2648,5 +2665,6 @@ class GstReport extends MY_Controller{
             endif;
         endif;
     }
+
 }
 ?>
