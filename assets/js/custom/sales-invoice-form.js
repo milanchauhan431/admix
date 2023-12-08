@@ -72,7 +72,7 @@ $(document).ready(function(){
         if (formData.item_id == "") {
 			$(".item_id").html("Item Name is required.");
 		}
-		if (formData.brand_id == "") {
+		if (formData.brand_id == "" || isNaN(formData.brand_id)) {
 			$(".brand_id").html("Brand Name is required.");
 		}
 		/* if (formData.item_name == "") {

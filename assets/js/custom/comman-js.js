@@ -368,7 +368,7 @@ $(document).ready(function(){
 		$("#"+modal_id+" .modal-footer .btn-close").attr('data-modal_class',"");
 		$(".select2").select2();
 	});
-
+	
 	$(document).on('change','.custom-file-input',function(){
 		var inputId = $(this).attr('id');
 		if($('#'+inputId).hasClass("multifiles")){

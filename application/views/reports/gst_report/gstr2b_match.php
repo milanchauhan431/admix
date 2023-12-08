@@ -9,8 +9,7 @@
 							<div class="col-md-2"><h4><?=$pageHeader?></h4></div>
 							<div class="col-md-10">
                                 <form enctype="multipart/form-data">
-									<div class="input-group">	
-										<!-- <input type="file" name="json_file" id="json_file" class="form-control-file" style="width:40%;" accept=".json">	 -->
+									<div class="input-group">
 										<div class="custom-file" style="width:15%;">
 											<input type="file" class="custom-file-input multifiles" name="json_file" id="json_file" accept=".json">
 											<label class="custom-file-label" for="json_file">Choose file</label>

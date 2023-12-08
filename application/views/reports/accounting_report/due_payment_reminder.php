@@ -97,11 +97,11 @@ var tableOption = {
         [ '10 rows', '20 rows', '25 rows', '50 rows', '75 rows', '100 rows','250 rows','500 rows' ]
     ],
     dom: "<'row'<'col-sm-7'B><'col-sm-5'f>>" + "<'row'<'col-sm-12't>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-    buttons: ['pageLength', 'excel',{ text: 'Pdf',action: function () {loadData('pdf'); } } , {text: 'Refresh',action: function (){ $(".refreshReportData").trigger('click'); } }],
+    buttons: ['pageLength', 'excel',{text: 'Refresh',action: function (){ $(".refreshReportData").trigger('click'); } }],
     "fnInitComplete":function(){ $('.dataTables_scrollBody').perfectScrollbar(); },
     "fnDrawCallback": function() { $('.dataTables_scrollBody').perfectScrollbar('destroy').perfectScrollbar(); }
 };
-
+//{ text: 'Pdf',action: function () {loadData('pdf'); } } , 
 $(document).ready(function(){
     loadData();
     $(document).on('click','.loadData',function(){

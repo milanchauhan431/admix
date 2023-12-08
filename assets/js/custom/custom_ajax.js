@@ -292,7 +292,7 @@ function reportTable(tableId = "reportTable",tableOptions = ""){
 				{className: "text-center",targets: [0, 1]},
 				{className: "text-center","targets": "_all"}
 			],
-			pageLength: 25,
+			pageLength: 250,
 			language: {search: ""},
 			lengthMenu: [
 				[ 10, 20, 25, 50, 75, 100, 250, -1 ],

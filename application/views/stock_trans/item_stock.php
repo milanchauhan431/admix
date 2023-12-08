@@ -25,11 +25,14 @@
                             <table id='reportTable' class="table table-bordered">
 								<thead class="thead-info" id="theadData">
                                     <tr class="text-center">
-                                        <th colspan="4">Stock Register</th>
+                                        <th colspan="7">Stock Register</th>
                                     </tr>
 									<tr>
 										<th class="text-center">#</th>
 										<th class="text-left">Item Description</th>
+										<th class="text-right">Op. Qty.</th>
+										<th class="text-right">In Qty.</th>
+										<th class="text-right">Out Qty.</th>
 										<th class="text-right">Balance Qty.</th>
 										<th class="text-right">Box Qty.</th>
 									</tr>
@@ -55,7 +58,7 @@ $(document).ready(function(){
 		$(".error").html("");
 		var valid = 1;
 		var item_type = $('#item_type').val();
-		var stock_type = $('#stock_type').val(); console.log('item_type: '+item_type+' | '+'stock_type: '+stock_type);
+		var stock_type = $('#stock_type').val();
 		if($("#item_type").val() == ""){$(".item_type").html("Item Type is required.");valid=0;}
 		if($("#stock_type").val() == ""){$(".stock_type").html("Stock type is required.");valid=0;}
 		if(valid){

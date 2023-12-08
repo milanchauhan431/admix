@@ -6,12 +6,12 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <h4 class="card-title pageHeader"><?=$pageHeader?></h4>
                             </div>       
-                            <div class="col-md-6 float-right">  
+                            <div class="col-md-9 float-right">  
                                 <div class="input-group">
-                                    <div class="input-group-append" style="width:50%;">
+                                    <div class="input-group-append" style="width:20%;">
                                         <select id="item_type" class="form-control select2">
                                             <?php
                                                 foreach($this->itemTypes as $type=>$typeName):
@@ -20,18 +20,24 @@
                                             ?>
                                         </select>
                                     </div>
-                                    <div class="input-group-append" style="width:30%;">
+                                    <div class="input-group-append" style="width:18%;">
+                                        <select id="unique_id" class="form-control select2">
+                                            <option value="">All Brand</option>
+                                            <?=getBrandListOption($brandList)?>
+                                        </select>
+                                    </div>
+                                    <div class="input-group-append" style="width:18%;">
                                         <select id="stock_type" class="form-control select2" >
                                             <option value="0">ALL</option>
                                             <option value="1">With Stock</option>
                                             <option value="2">Without Stock</option>
                                         </select>
                                     </div>
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn waves-effect waves-light btn-success refreshReportData loadData" title="Load Data">
-									        <i class="fas fa-sync-alt"></i> Load
-								        </button>
-                                    </div>
+                                    <input type="date" id="from_date" class="form-control" value="<?=$from_date?>">
+                                    <input type="date" id="to_date" class="form-control" value="<?=$to_date?>">
+                                    <button type="button" class="btn waves-effect waves-light btn-success refreshReportData loadData" title="Load Data">
+                                        <i class="fas fa-sync-alt"></i> Load
+                                    </button>
                                 </div>
                                 <div class="error stock_type"></div>
                             </div>                  
@@ -42,11 +48,14 @@
                             <table id='reportTable' class="table table-bordered">
 								<thead class="thead-info" id="theadData">
                                     <tr class="text-center">
-                                        <th colspan="4">Stock Register</th>
+                                        <th colspan="7">Stock Register</th>
                                     </tr>
 									<tr>
 										<th class="text-center">#</th>
 										<th class="text-left">Item Description</th>
+										<th class="text-right">Op. Qty.</th>
+										<th class="text-right">In Qty.</th>
+										<th class="text-right">Out Qty.</th>
 										<th class="text-right">Balance Qty.</th>
 										<th class="text-right">Box Qty.</th>
 									</tr>
@@ -73,12 +82,20 @@ $(document).ready(function(){
 		var valid = 1;
 		var item_type = $('#item_type').val();
 		var stock_type = $('#stock_type').val();
+		var unique_id = $('#unique_id').val();
+        var from_date = $('#from_date').val();
+	    var to_date = $('#to_date').val();
+
 		if($("#item_type").val() == ""){$(".item_type").html("Item Type is required.");valid=0;}
 		if($("#stock_type").val() == ""){$(".stock_type").html("Stock type is required.");valid=0;}
+        if(from_date == ""){$(".from_date").html("From Date is required.");valid=0;}
+        if(to_date == ""){$(".to_date").html("To Date is required.");valid=0;}
+        if(from_date > to_date){$(".from_date").html("Invalid Date.");valid=0;}
+
 		if(valid){
             $.ajax({
                 url: base_url + controller + '/getStockRegisterData',
-                data: {item_type:item_type,stock_type:stock_type},
+                data: {item_type:item_type,stock_type:stock_type,unique_id:unique_id,from_date:from_date,to_date:to_date},
 				type: "POST",
 				dataType:'json',
 				success:function(data){

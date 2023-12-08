@@ -10,6 +10,9 @@ class StoreReport extends MY_Controller{
     public function stockRegister(){
         $this->data['pageHeader'] = 'STOCK REGISTER';
         $this->data['headData']->pageUrl = "reports/storeReport/stockRegister";
+        $this->data['from_date'] = $this->startYearDate;
+        $this->data['to_date'] = $this->endYearDate;
+        $this->data['brandList'] = $this->brandMaster->getBrandList();
         $this->load->view("reports/store_report/item_stock",$this->data);
     }
 
@@ -19,15 +22,18 @@ class StoreReport extends MY_Controller{
 
         $tbody = '';$i=1;
         foreach($result as $row):
-			$box_qty = (!empty(floatVal($row->stock_qty)) && !empty(floatval($row->packing_standard)))? ceil((floatVal($row->stock_qty) / $row->packing_standard)) : 0;
+			$box_qty = (!empty(floatVal($row->cl_stock_qty)) && !empty(floatval($row->packing_standard)))? ceil((floatVal($row->cl_stock_qty) / $row->packing_standard)) : 0;
             $tbody .= '<tr>
                 <td class="text-center">'.$i++.'</td>
                 <td class="text-left">
-					<a href="'.base_url("reports/storeReport/getItemHistory/".$row->item_id).'" target="_blank" datatip="History" flow="left">'.$row->item_name.'</a>
+					<a href="'.base_url("reports/storeReport/itemHistory/".$row->item_id).'" target="_blank" datatip="History" flow="left">'.$row->item_name.'</a>
 				</td>
+                <td class="text-right">'.floatVal($row->op_stock_qty).'</td>
+                <td class="text-right">'.floatVal($row->in_stock_qty).'</td>
+                <td class="text-right">'.floatVal($row->out_stock_qty).'</td>
                 <td  class="text-right">
 					<a class="stockTransactions" data-item_id="'.$row->item_id.'" data-item_name="'.$row->item_name.'" datatip="Brand Wise" flow="left" href="javascript:void(0)">
-						'.floatVal($row->stock_qty).'
+						'.floatVal($row->cl_stock_qty).'
 					</a>
 				</td>
 				<td class="text-right">'.$box_qty.'</td>
@@ -36,47 +42,61 @@ class StoreReport extends MY_Controller{
 
         $this->printJson(['status'=>1,'tbody'=>$tbody]);
     }
+
+    public function itemHistory($item_id=""){
+        $this->data['itemData'] = $this->item->getItem(['id'=>$item_id]);
+        $this->data['from_date'] = $this->startYearDate;
+        $this->data['to_date'] = $this->endYearDate;
+        $this->data['brandList'] = $this->brandMaster->getBrandList();
+        $this->load->view('reports/store_report/item_history',$this->data);
+    }
 	
-	public function getItemHistory($item_id=""){
-		$data['item_id'] = $item_id;
-        $itemData = $this->storeReport->getItemHistory($data);
+	public function getItemHistory(){
+		$data = $this->input->post();
+        $itemData = $this->item->getItem(['id'=>$data['item_id']]);
+        $itemSummary = $this->storeReport->getItemSummary($data);
+        $itemHistory = $this->storeReport->getItemHistory($data);
+
+        $thead = '<tr class="text-center">
+            <th colspan="5" class="text-left">'.((!empty($itemData))?$itemData->item_name:"Item History").'</th>
+            <th colspan="2" class="text-right">Op. Stock : '.floatVal($itemSummary->op_stock_qty).'</th>
+        </tr>
+        <tr>
+            <th style="min-width:25px;">#</th>
+            <th style="min-width:100px;">Trans. Type</th>
+            <th style="min-width:100px;">Trans. No.</th>
+            <th style="min-width:50px;">Trans. Date</th>
+            <th style="min-width:50px;">Inward</th>
+            <th style="min-width:50px;">Outward</th>
+            <th style="min-width:50px;">Balance</th>
+        </tr>';
 		
-        $i=1; $tbody =""; $tfoot=""; $item_name=""; $credit=0;$debit=0; $tcredit=0;$tdebit=0; $tbalance=0;
-        foreach($itemData as $row):
-            $credit=0;$debit=0;
-            if($row->p_or_m == 1){ 
-				$credit = abs($row->qty);$tbalance +=abs($row->qty); 
-			} else { 
-				$debit = abs($row->qty);$tbalance -=abs($row->qty); 
-			}
-            
+        $i=1; $tbody =""; $tfoot=""; $balanceQty = $itemSummary->op_stock_qty;
+        foreach($itemHistory as $row):  
+            $balanceQty += $row->qty * $row->p_or_m;          
             $tbody .= '<tr>
                 <td>' . $i++ . '</td>
                 <td>'.$row->sub_menu_name.'</td>
                 <td>'.$row->ref_no.'</td>
                 <td>'.formatDate($row->ref_date).'</td>
-                <td>'.floatVal($credit).'</td>
-                <td>'.floatVal($debit).'</td>
-                <td>'.floatVal($tbalance).'</td>
+                <td>'.floatVal($row->in_qty).'</td>
+                <td>'.floatVal($row->out_qty).'</td>
+                <td>'.floatVal($balanceQty).'</td>
             </tr>';
-            $tcredit += $credit; $tdebit += $debit;
-			$item_name = $row->item_name;
         endforeach;
-        $tfoot .= '<tr class="thead-info">
-                <th colspan="4">Total</th>
-                <th>' .floatVal($tcredit). '</th>
-                <th>' .floatVal($tdebit). '</th>
-                <th>' .floatVal($tbalance). '</th>
-            </tr>';
-		$this->data['item_name'] = $item_name;
-        $this->data['tbody'] = $tbody;
-        $this->data['tfoot'] = $tfoot;
-        $this->load->view('reports/store_report/item_history',$this->data);
+
+        $tfoot .= '<tr>
+            <th colspan="4" class="text-right">Cl. Stock</th>
+            <th>' .floatVal($itemSummary->in_stock_qty). '</th>
+            <th>' .floatVal($itemSummary->out_stock_qty). '</th>
+            <th>' .floatVal($itemSummary->cl_stock_qty). '</th>
+        </tr>';
+
+        $this->printJson(['status'=>1,'thead'=>$thead,'tbody'=>$tbody,'tfoot'=>$tfoot]);
     }
 	
 	public function stockTransactions(){    
-		$this->data['item_id'] = $this->input->post('item_id');
-		$data['item_id'] = $this->data['item_id'];
+		$data = $this->input->post();
         $result = $this->storeReport->getStockTransaction($data);
         
         $tbody = ""; $i=1;

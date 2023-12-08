@@ -6,9 +6,27 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-4">
                                 <h4 class="card-title pageHeader">Item History</h4>
                             </div> 
+							<div class="col-md-8">
+								<input type="hidden" id="item_id" value="<?=(!empty($itemData))?$itemData->id:""?>">
+								<div class="input-group">
+									<div class="input-group-append" style="width:18%;">
+                                        <select id="unique_id" class="form-control select2">
+                                            <option value="">All Brand</option>
+                                            <?=getBrandListOption($brandList)?>
+                                        </select>
+                                    </div>
+									<input type="date" id="from_date" class="form-control" value="<?=$from_date?>">
+									<input type="date" id="to_date" class="form-control" value="<?=$to_date?>">
+									<div class="input-group-append">
+										<button type="button" class="btn waves-effect waves-light btn-success float-right refreshReportData loadData" title="Load Data">
+											<i class="fas fa-sync-alt"></i> Load
+										</button>
+									</div>
+								</div>
+							</div>
 						</div>                                   
                     </div>
                     <div class="card-body reportDiv" style="min-height:75vh">
@@ -16,7 +34,8 @@
                             <table id='reportTable' class="table table-bordered">
 								<thead class="thead-info" id="theadData">
                                     <tr class="text-center">
-                                        <th colspan="7"><?=(!empty($item_name)?$item_name:'Item History')?> </th>
+                                        <th colspan="5" class="text-left"><?=(!empty($itemData)?$itemData->item_name:'Item History')?></th>
+										<th colspan="2" class="text-right">Op. Stock : 0</th>
                                     </tr>
 									<tr>
 										<th style="min-width:25px;">#</th>
@@ -28,8 +47,15 @@
 										<th style="min-width:50px;">Balance</th>
 									</tr>
 								</thead>
-								<tbody id="tbodyData"><?php echo $tbody; ?></tbody>
-                                <tfoot id="tfootData"><?php echo $tfoot; ?></tfoot>
+								<tbody id="tbodyData"></tbody>
+                                <tfoot class="thead-info" id="tfootData">
+									<tr>
+										<th colspan="4" class="text-right">Cl. Stock</th>
+										<th>0</th>
+										<th>0</th>
+										<th>0</th>
+									</tr>
+								</tfoot>
 							</table>
                         </div>
                     </div>
@@ -41,84 +67,44 @@
 
 
 <?php $this->load->view('includes/footer'); ?>
-<?=$floatingMenu?>
+
 <script>
 $(document).ready(function(){
 	reportTable();
+	loadData();
 
-	$(document).on('change','#item_type', function(e){
-		var item_type = $(this).val();
-		if(item_type){
-			$.ajax({
-                url: base_url + controller + '/getItemList',
-                data: {item_type:item_type},
-				type: "POST",
-				dataType:'json',
-				success:function(data){
-					$("#item_id").html("");
-					$("#item_id").html(data.itemData);
-					$("#item_id").comboSelect();
-                }
-            });
-		}
-	});
-
-    $(document).on('click','.loaddata',function(e){
-		$(".error").html("");
-		var valid = 1;
-		var item_id = $('#item_id').val();
-		if($("#item_id").val() == ""){$(".item_id").html("Item is required.");valid=0;}
-		if(valid)
-		{
-            $.ajax({
-                url: base_url + controller + '/getItemHistory',
-                data: {item_id:item_id},
-				type: "POST",
-				dataType:'json',
-				success:function(data){
-                    $("#reportTable").dataTable().fnDestroy();
-					$("#tbodyData").html(data.tbody);
-					$("#tfootData").html(data.tfoot);
-					reportTable();
-                }
-            });
-        }
+    $(document).on('click','.loadData',function(e){
+		loadData();
     });   
 });
-function reportTable()
-{
-	var reportTable = $('#reportTable').DataTable( 
-	{
-		responsive: true,
-		scrollY: '55vh',
-        scrollCollapse: true,
-		"scrollX": true,
-		"scrollCollapse":true,
-		//'stateSave':true,
-		"autoWidth" : false,
-		order:[],
-		"columnDefs": 	[
-							{ type: 'natural', targets: 0 },
-							{ orderable: false, targets: "_all" }, 
-							{ className: "text-left", targets: [0,1] }, 
-							{ className: "text-center", "targets": "_all" } 
-						],
-		pageLength:25,
-		language: { search: "" },
-		lengthMenu: [
-            [ 10, 25, 50, 100, -1 ],[ '10 rows', '25 rows', '50 rows', '100 rows', 'Show all' ]
-        ],
-		dom: "<'row'<'col-sm-7'B><'col-sm-5'f>>" +"<'row'<'col-sm-12't>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-		buttons: [ 'pageLength', 'excel'],
-		"initComplete": function(settings, json) {$('body').find('.dataTables_scrollBody').addClass("ps-scrollbar");}
-	});
-	reportTable.buttons().container().appendTo( '#reportTable_wrapper toolbar' );
-	$('.dataTables_filter .form-control-sm').css("width","97%");
-	$('.dataTables_filter .form-control-sm').attr("placeholder","Search.....");
-	$('.dataTables_filter').css("text-align","left");
-	$('.dataTables_filter label').css("display","block");
-	$('.btn-group>.btn:first-child').css("border-top-right-radius","0");
-	$('.btn-group>.btn:first-child').css("border-bottom-right-radius","0");
-	return reportTable;
+
+function loadData(){
+	$(".error").html("");
+	var valid = 1;
+	var item_id = $('#item_id').val();
+	var unique_id = $('#unique_id').val();
+	var from_date = $('#from_date').val();
+	var to_date = $('#to_date').val();
+	
+	if(item_id == ""){$(".item_id").html("Item is required.");valid=0;}
+	if(from_date == ""){$(".from_date").html("From Date is required.");valid=0;}
+	if(to_date == ""){$(".to_date").html("To Date is required.");valid=0;}
+	if(from_date > to_date){$(".from_date").html("Invalid Date.");valid=0;}
+	
+	if(valid){
+		$.ajax({
+			url: base_url + controller + '/getItemHistory',
+			data: {item_id:item_id,unique_id:unique_id,from_date:from_date,to_date:to_date},
+			type: "POST",
+			dataType:'json',
+			success:function(data){
+				$("#reportTable").dataTable().fnDestroy();
+				$("#theadData").html(data.thead);
+				$("#tbodyData").html(data.tbody);
+				$("#tfootData").html(data.tfoot);
+				reportTable();
+			}
+		});
+	}
 }
 </script>

@@ -2358,7 +2358,6 @@ class GstReport extends MY_Controller{
                         
                         if(!empty($result) || !empty($jsonData)):
                             if(count((array)$result) > count((array)$jsonData)):
-                                //print_r("ok");exit;
                                 foreach($result as $resultRow):
                                     $tbodyHtml = '';
                                     $matchingRow = array();$bgColor="none";$matchingStatus = false;
@@ -2665,6 +2664,5 @@ class GstReport extends MY_Controller{
             endif;
         endif;
     }
-
 }
 ?>
